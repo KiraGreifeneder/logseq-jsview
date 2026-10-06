@@ -1,0 +1,22 @@
+{
+  "name": "logseq-jsq",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A logseq plugin that abstracts and simplifies data retrieval and display through javascript.",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
+  "devDependencies": {
+    "tsdown": "^0.22.5",
+    "typescript": "^7.0.2"
+  }
+}
