@@ -1,7 +1,11 @@
 import { defineConfig } from 'tsdown'
 
+
 export default defineConfig({
-  dts: true,
-  exports: true,
-  // ...config options
-})
+  dts: false,
+  exports: false,
+  platform: 'browser',
+  deps: {
+    alwaysBundle: ['@logseq/libs'],
+  },
+}) 
