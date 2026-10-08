@@ -53,6 +53,10 @@ export class Jsq {
     return await logseq.DB.datascriptQuery(query);
   }
 
+  // TODO maybe also add a function for using the simple native queries. 
+  // that way we can efficiently but easily gather all our pages based on a prop
+  // then go through those pages with JS to find TODOs and create a table from them
+
   async pages() : Promise<PageEntity[]> {
     const allPagesQuery = `
       [
