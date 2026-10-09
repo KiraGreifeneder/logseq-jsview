@@ -1,91 +1,50 @@
 import { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
 
-const JSQ_BLOCK_REGEX = /^\x60{3}jsq[ \t]*\r?\n([\s\S]*?)\r?\n?^\x60{3}[ \t]*$/m;
-const AsyncFunction = Object.getPrototypeOf(async function () { }).constructor;
-
-export function findJsqBlock() { }
-
-export async function executeLocalJsq(slotId: string, blockUuid: string) {
-  const block = await logseq.Editor.getBlock(blockUuid);
-  const jsq_block_matches = block?.content?.match(JSQ_BLOCK_REGEX);
-  if (!jsq_block_matches) {
-    console.error("no valid jsq block found");
-    return;
-  }
-
-  //parse jsq block
-  const jsq_block_contents = jsq_block_matches[1];
-
-  const test = new Jsq();
-
-  console.log(jsq_block_contents);
-
-  let out;
-  let result;
-  try {
-    out = new AsyncFunction("logseq", jsq_block_contents); // SyntaxError here
-  } catch (e) {
-    console.error("jsq block failed to compile:", e);
-    return;
-  }
-
-  try {
-    result = await out(logseq); // runtime errors and rejections here
-  } catch (e) {
-    console.error("jsq block threw:", e);
-  }
-
-  logseq.provideUI({
-    key: "jsq",
-    slot: slotId,
-    reset: true,
-    // TODO insert whatever we wanted to render here
-    template: `
-            ${result}
-        `,
-  });
+async function datascriptQuery(query: string) {
+  return await logseq.DB.datascriptQuery(query);
 }
 
+async function simpleQuery(query: string) {
+  return await logseq.DB.q(query);
+}
 
+// TODO separa queryBuilder that lets you build a native query for efficiency
+// that creates a string that we can pass to nativeQuery()
+// would be cross-platform as we cans simply choose the correct backend
 
-export class Jsq {
-  async nativeQuery(query: string) {
-    return await logseq.DB.datascriptQuery(query);
-  }
-
-  // TODO maybe also add a function for using the simple native queries. 
-  // that way we can efficiently but easily gather all our pages based on a prop
-  // then go through those pages with JS to find TODOs and create a table from them
-
-  async pages() : Promise<PageEntity[]> {
-    const allPagesQuery = `
+async function allPages(): Promise<PageEntity[]> {
+  const allPagesQuery = `
       [
         :find (pull ?p [*])
         :where
           [?p :block/name]
-      ]`
-    
-    return await logseq.DB.datascriptQuery(allPagesQuery);
-  }
+      ]`;
 
-  async pageByName(name: string) : Promise<PageEntity> {
-    const pageByNameQuery = `
+  return await datascriptQuery(allPagesQuery);
+}
+
+async function pageByName(name: string): Promise<PageEntity> {
+  const pageByNameQuery = `
       [
         :find (pull ?p [*])
         :where
           [?p :block/name "${name.toLowerCase()}"]
-      ]`
-    
-    const matches : PageEntity[][] = await logseq.DB.datascriptQuery(pageByNameQuery);
+      ]`;
 
-    return matches[0][0];
-  }
+  const matches: PageEntity[][] =
+    await logseq.DB.datascriptQuery(pageByNameQuery);
 
-  async blocks(pageUuid: string) : Promise<BlockEntity[]> {
-    return await logseq.Editor.getPageBlocksTree(pageUuid);
-  }
-
-  async test() {
-    return "hello!"
-  }
+  return matches[0][0];
 }
+
+async function blocksInPage(pageUuid: string): Promise<BlockEntity[]> {
+  return await logseq.Editor.getPageBlocksTree(pageUuid);
+}
+
+export const jsq = {
+  blocksInPage,
+  datascriptQuery,
+  allPages,
+  pageByName,
+  simpleQuery,
+};
