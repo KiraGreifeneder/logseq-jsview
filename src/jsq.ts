@@ -1,4 +1,10 @@
+/**
+ * Represents the public interface for jsq.
+ * All functions here are exported and provided through the `jsq` in their codeblocks.
+ */
+
 import { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
+import { Props, Table } from "./ui";
 
 async function datascriptQuery(query: string) {
   return await logseq.DB.datascriptQuery(query);
@@ -41,10 +47,15 @@ async function blocksInPage(pageUuid: string): Promise<BlockEntity[]> {
   return await logseq.Editor.getPageBlocksTree(pageUuid);
 }
 
+function table(props?: Props) {
+  return new Table(props);
+}
+
 export const jsq = {
   blocksInPage,
   datascriptQuery,
   allPages,
   pageByName,
   simpleQuery,
+  table,
 };

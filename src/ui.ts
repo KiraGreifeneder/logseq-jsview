@@ -39,19 +39,19 @@ export class Table {
       .join(" ");
   }
 
-  private static rowToString(row: Row, elementType: "tr" | "th") {
+  private static rowToString(row: Row, elementType: "td" | "th") {
     const cells = Table.cellsFromRow(row);
 
     const cellStrings = cells.map((cell) => {
       const content = Table.contentFromCell(cell);
       const props = Table.getPropsString(cell);
       const propsStr = props ? ` ${props}` : "";
-      return `<td${propsStr}> ${content} </td>`;
+      return `<${elementType}${propsStr}> ${content} </${elementType}>`;
     });
 
     const rowProps = Table.getPropsString(row);
     const rowPropsStr = rowProps ? ` ${rowProps}` : "";
-    return `<${elementType}${rowPropsStr}> ${cellStrings.join(" ")} </${elementType} >`;
+    return `<tr ${rowPropsStr}> ${cellStrings.join(" ")} </tr>`;
   }
 
   private errsAsElements() {
@@ -65,51 +65,35 @@ export class Table {
   }
 
   headers(header: Row): this {
-    if (Table.cellsFromRow(header).length === 0) {
-      this.errs.push(
-        "Header has no entries; Set a header with at least one column.",
-      );
-      return this;
-    }
-
     this.header = header;
     return this;
   }
 
   row(row: Row): this {
-    const length = Table.cellsFromRow(row).length;
-
-    if (!this.header) {
-      this.errs.push("Missing header; Add a header before adding rows.");
-      return this;
-    }
-
-    if (length != this.nCols()) {
-      this.errs.push("Row doesn't match header length!");
-      return this;
-    }
-
     this.rows.push(row);
     return this;
   }
 
   toString(): string {
-    if (!this.header) {
-      this.errs.push(
-        "Table has no header; Add a header before calling toString()",
-      );
-      return this.errsAsElements(); // early return mainly for typechecking
-    }
-
     if (this.errs.length > 0) {
       return this.errsAsElements();
     }
 
     const propsStr = this.props ? ` ${Table.propsToString(this.props)}` : "";
-    let tableString = `<table class=table-auto${propsStr}> <thead>`;
-    const headerString = Table.rowToString(this.header, "th");
-    const rowStrings = this.rows.map((row) => Table.rowToString(row, "tr"));
 
-    return tableString.concat(headerString, ...rowStrings, "</table>");
+    let tableString = `<table class="table-auto" ${propsStr}> <thead>`;
+
+    const headerString = this.header
+      ? Table.rowToString(this.header, "th")
+      : "";
+
+    const rowStrings = this.rows.map((row) => Table.rowToString(row, "td"));
+
+    return tableString.concat(
+      headerString,
+      "</thead>",
+      ...rowStrings,
+      "</table>",
+    );
   }
 }
