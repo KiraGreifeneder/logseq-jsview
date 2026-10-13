@@ -4,7 +4,7 @@
  */
 
 import { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
-import { Props, Table } from "./ui";
+import { button, Props, Table } from "./ui";
 
 async function datascriptQuery(query: string) {
   return await logseq.DB.datascriptQuery(query);
@@ -58,4 +58,5 @@ export const jsq = {
   pageByName,
   simpleQuery,
   table,
+  button,
 };

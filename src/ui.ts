@@ -10,19 +10,8 @@ export class Table {
   private rows: Row[] = [];
   private errs: string[] = [];
 
-  private nCols(): number | undefined {
-    if (!this.header) {
-      return undefined;
-    }
-    return Table.cellsFromRow(this.header).length;
-  }
-
   private static cellsFromRow(row: Row): Cell[] {
     return "cells" in row ? row.cells : row;
-  }
-
-  private static contentFromCell(cell: Cell) {
-    return typeof cell === "string" ? cell : cell.content;
   }
 
   private static getPropsString(element: Row | Cell) {
@@ -39,11 +28,11 @@ export class Table {
       .join(" ");
   }
 
-  private static rowToString(row: Row, elementType: "td" | "th") {
+  private rowToString(row: Row, elementType: "td" | "th") {
     const cells = Table.cellsFromRow(row);
 
     const cellStrings = cells.map((cell) => {
-      const content = Table.contentFromCell(cell);
+      const content = this.contentFromCell(cell);
       const props = Table.getPropsString(cell);
       const propsStr = props ? ` ${props}` : "";
       return `<${elementType}${propsStr}> ${content} </${elementType}>`;
@@ -52,6 +41,19 @@ export class Table {
     const rowProps = Table.getPropsString(row);
     const rowPropsStr = rowProps ? ` ${rowProps}` : "";
     return `<tr ${rowPropsStr}> ${cellStrings.join(" ")} </tr>`;
+  }
+
+  private contentFromCell(cell: Cell) {
+    if (typeof cell === "string") {
+      return cell;
+    } else if (cell.content && typeof cell.content === "string") {
+      return cell.content;
+    } else {
+      this.errs.push(
+        "Couldn't read non-string cell content; Ensure that all cells contain string representations",
+      );
+      return "";
+    }
   }
 
   private errsAsElements() {
@@ -83,11 +85,9 @@ export class Table {
 
     let tableString = `<table class="table-auto" ${propsStr}> <thead>`;
 
-    const headerString = this.header
-      ? Table.rowToString(this.header, "th")
-      : "";
+    const headerString = this.header ? this.rowToString(this.header, "th") : "";
 
-    const rowStrings = this.rows.map((row) => Table.rowToString(row, "td"));
+    const rowStrings = this.rows.map((row) => this.rowToString(row, "td"));
 
     return tableString.concat(
       headerString,
@@ -96,4 +96,17 @@ export class Table {
       "</table>",
     );
   }
+}
+
+const buttonStyleClasses = [
+  "ui__button",
+  "font-medium",
+  "text-xs",
+  "rounded",
+  "px-3",
+].join(" ");
+
+// TODO need to register in model for the block!
+export function button(text: string, onclickFnName?: string) {
+  return `<button class="${buttonStyleClasses}" onclick=${onclick}> ${text} </button>`;
 }

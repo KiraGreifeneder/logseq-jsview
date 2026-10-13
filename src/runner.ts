@@ -30,7 +30,6 @@ export async function executeLocalJsq(slotId: string, blockUuid: string) {
       key: "jsq",
       slot: slotId,
       reset: true,
-      // TODO insert whatever we wanted to render here
       template: `
             <code style="color:red"> jsq block failed to compile: ${e} </code>
         `,
@@ -44,13 +43,10 @@ export async function executeLocalJsq(slotId: string, blockUuid: string) {
     console.error("jsq block threw:", e);
   }
 
-  console.log(typeof jsq);
-
   logseq.provideUI({
     key: "jsq",
     slot: slotId,
     reset: true,
-    // TODO insert whatever we wanted to render here
     template: `
             ${userFunctionResult}
         `,
