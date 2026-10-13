@@ -14,9 +14,11 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "dev": "tsdown --watch"
+    "dev": "tsdown --watch",
+    "test": "node --test"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
     "tsdown": "^0.22.5",
     "typescript": "^7.0.2"
   },

@@ -1,19 +1,12 @@
-const course_pages = await jsq.simpleQuery(`(page-property :semester "WS26")`)
+const deadlines = await jsq.simpleQuery(`(page-property :semester "WS26")`);
 
-let table = `
-    <table class=table-auto>
-        <thead>
-            <th>name</th>
-`
+const table = jsq.table();
 
-const table_end = "</thead> </table>"
-
-for (page of course_pages) {
-    table = table.concat(`
-        <tr> <td> ${page.name} </td> </tr>    
-    `)
+for (d of deadlines) {
+  const props = d.properties;
+  table.row([props.deadline]);
 }
 
-table.concat(table_end)
+table.concat(table_end);
 
-return table
+return table;
