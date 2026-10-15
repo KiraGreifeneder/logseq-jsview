@@ -26,14 +26,11 @@ export async function executeLocalJsq(slotId: string, blockUuid: string) {
     userFunction = new AsyncFunction("jsq", "logseq", jsqUserCode);
   } catch (e) {
     console.error("jsq block failed to compile:", e);
-    logseq.provideUI({
-      key: "jsq",
-      slot: slotId,
-      reset: true,
-      template: `
-            <code style="color:red"> jsq block failed to compile: ${e} </code>
-        `,
-    });
+    renderBlock(
+      slotId,
+      blockUuid,
+      `<code style="color:red"> jsq block failed to compile: ${e} </code>`,
+    );
     return;
   }
 
@@ -43,12 +40,28 @@ export async function executeLocalJsq(slotId: string, blockUuid: string) {
     console.error("jsq block threw:", e);
   }
 
+  renderBlock(slotId, blockUuid, userFunctionResult);
+}
+
+function renderBlock(slotId: string, blockUuid: string, content: string) {
+  const toggleId = crypto.randomUUID();
+
+  const codeToggle = `<button
+  data-on-click="toggleCode"
+  data-toggle-id="${toggleId}"
+  title="Show/hide code"
+  class="absolute top-0 left-0 z-10 px-1.5 text-xs font-mono opacity-30 hover:opacity-100 transition-opacity cursor-pointer bg-transparent"
+>show/hide jsq block &lt;/&gt;</button>`;
+
   logseq.provideUI({
     key: "jsq",
     slot: slotId,
     reset: true,
     template: `
-            ${userFunctionResult}
-        `,
+    <div class="relative w-full">
+      ${codeToggle}
+      <div class="relative w-full">${content}</div>
+    </div>
+  `,
   });
 }

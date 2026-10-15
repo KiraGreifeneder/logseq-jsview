@@ -1,4 +1,5 @@
 import "@logseq/libs";
+import { jsq } from "./jsq";
 import { executeLocalJsq } from "./runner";
 
 function registerJsqMode() {
@@ -15,25 +16,43 @@ async function main() {
     key: "hide-jsq-code",
     style: `
     .block-content:has(.lsp-hook-ui-slot) .extensions__code {
-      max-height: 8px;
-      overflow: hidden;
-      opacity: 0.35;
-      transition: max-height .15s ease .3s, opacity .15s ease .3s;
+      display: none;
     }
-    .block-content:has(.lsp-hook-ui-slot) .extensions__code:hover {
-      max-height: 100vh;
-      opacity: 1;
-      transition-delay: .25s, .25s;
-    }
-    .block-content:has(.lsp-hook-ui-slot) .extensions__code:focus-within {
-      max-height: 100vh;
-      opacity: 1;
-      transition-delay: 0s;
+    .block-content.jsq-code-open .extensions__code {
+      display: block;
     }
   `,
   });
 
+  logseq.provideStyle({
+    key: "jsq-table-width",
+    style: `
+    .lsp-hook-ui-slot,
+    .lsp-hook-ui-slot > * { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+    .lsp-hook-ui-slot table { width: 100% !important; }
+  `,
+  });
+
+  jsq.registerFunction("toggleCode", (e: any) => {
+    const doc = top?.document;
+    const btn = doc?.querySelector(`[data-toggle-id="${e.dataset.toggleId}"]`);
+    const block = btn?.closest(".block-content");
+    if (!block) return;
+
+    block.classList.toggle("jsq-code-open");
+
+    if (block.classList.contains("jsq-code-open")) {
+      // wait one tick so the browser has laid out the now-visible element
+      setTimeout(() => {
+        block
+          .querySelectorAll(".CodeMirror")
+          .forEach((el: any) => el.CodeMirror?.refresh());
+      }, 0);
+    }
+  });
+
   registerJsqMode();
+
   logseq.Editor.registerSlashCommand("New in-line JSQ", async () => {
     await logseq.Editor.insertAtEditingCursor(`{{renderer :jsq}} `);
   });

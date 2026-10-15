@@ -43,9 +43,8 @@ export function button(
   const uuid = crypto.randomUUID();
   const fnName = `custom-btn-fn-${uuid}`;
   jsq.registerFunction(fnName, onclick);
-  if (onclick.name) {
-    attrs.push(`data-on-click="${fnName}"`);
-  }
+
+  attrs.push(`data-on-click="${fnName}"`);
 
   for (const [key, value] of Object.entries(data)) {
     if (value == null) continue; // skip null and undefined
