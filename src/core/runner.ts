@@ -1,4 +1,4 @@
-import { jsq } from "./jsq";
+import { jsq } from "../lib/jsq";
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 

@@ -1,6 +1,6 @@
 import "@logseq/libs";
-import { jsq } from "./jsq";
-import { executeLocalJsq } from "./runner";
+import { executeLocalJsq } from "./core/runner";
+import { jsq } from "./lib/jsq";
 
 function registerJsqMode() {
   const CM = (window.parent as any).CodeMirror;
