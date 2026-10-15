@@ -10,18 +10,11 @@ function registerJsqMode() {
   CM.defineMIME("jsq", "javascript");
 }
 
-logseq.ready(() => {
-  registerJsqMode();
-});
-
 async function main() {
   registerJsqMode();
-
   logseq.Editor.registerSlashCommand("New in-line JSQ", async () => {
     await logseq.Editor.insertAtEditingCursor(`{{renderer :jsq}} `);
   });
-
-  logseq.provideModel({});
 
   logseq.App.onMacroRendererSlotted(({ slot, payload }) => {
     const [type] = payload.arguments;
