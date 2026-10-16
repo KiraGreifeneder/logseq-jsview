@@ -1,6 +1,7 @@
 import { jsq } from "../lib/jsq";
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+const minify = (html: string) => html.replace(/>\s+</g, "><").trim();
 
 export async function getLocalJsqBlockContents(blockUuid: string) {
   const JSQ_BLOCK_REGEX =
@@ -57,11 +58,11 @@ function renderBlock(slotId: string, blockUuid: string, content: string) {
     key: "jsq",
     slot: slotId,
     reset: true,
-    template: `
+    template: minify(`
     <div class="relative w-full">
       ${codeToggle}
-      <div class="relative w-full">${content}</div>
+      <div class="relative w-full mt-3">${content}</div>
     </div>
-  `,
+  `),
   });
 }
