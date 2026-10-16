@@ -2,6 +2,13 @@ import "@logseq/libs";
 import { executeLocalJsq } from "./core/runner";
 import { jsq } from "./lib/jsq";
 
+const JSQ_BLOCK = `
+  ${"```"}jsq
+
+  ${"```"}
+  {{renderer :jsq}}
+`;
+
 function registerJsqMode() {
   const CM = (window.parent as any).CodeMirror;
   if (!CM) {
@@ -54,7 +61,7 @@ async function main() {
   registerJsqMode();
 
   logseq.Editor.registerSlashCommand("New in-line JSQ", async () => {
-    await logseq.Editor.insertAtEditingCursor(`{{renderer :jsq}} `);
+    await logseq.Editor.insertAtEditingCursor(JSQ_BLOCK);
   });
 
   logseq.App.onMacroRendererSlotted(({ slot, payload }) => {
