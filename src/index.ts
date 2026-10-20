@@ -2,12 +2,15 @@ import "@logseq/libs";
 import { executeLocalJsq } from "./core/runner";
 import { jsq } from "./lib/jsq";
 
-const JSQ_BLOCK = `
+function getNewJsqBlock() {
+  const uuid = crypto.randomUUID();
+  return `
   ${"```"}jsq
 
   ${"```"}
-  {{renderer :jsq}}
+  {{renderer :jsq-${uuid}}}
 `;
+}
 
 function registerJsqMode() {
   const CM = (window.parent as any).CodeMirror;
@@ -18,7 +21,7 @@ function registerJsqMode() {
   CM.defineMIME("jsq", "javascript");
 }
 
-async function main() {
+function provideJsqBlockStyles() {
   logseq.provideStyle({
     key: "hide-jsq-code",
     style: `
@@ -39,6 +42,10 @@ async function main() {
     .lsp-hook-ui-slot table { width: 100% !important; }
   `,
   });
+}
+
+async function main() {
+  provideJsqBlockStyles();
 
   jsq.registerFunction("toggleCode", (e: any) => {
     const doc = top?.document;
@@ -61,15 +68,22 @@ async function main() {
   registerJsqMode();
 
   logseq.Editor.registerSlashCommand("New in-line JSQ", async () => {
-    await logseq.Editor.insertAtEditingCursor(JSQ_BLOCK);
+    await logseq.Editor.insertAtEditingCursor(getNewJsqBlock());
   });
 
   logseq.App.onMacroRendererSlotted(({ slot, payload }) => {
     const [type] = payload.arguments;
     if (!type?.startsWith(":jsq")) return;
-    executeLocalJsq(slot, payload.uuid); // find local jsq block
 
-    // TODO handle custom jsq scripts somewhere that are referenced via jsq_functionname
+    console.log(
+      "FOUND AND STARTING WORK FOR SLOT, UUID",
+      slot,
+      payload.uuid,
+      type,
+    );
+    executeLocalJsq(slot, payload.uuid, type.substring(1));
+
+    // TODO handle custom jsq scripts somewhere that are referenced via jsq-exported-functionname
   });
 }
 

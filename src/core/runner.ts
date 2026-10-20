@@ -3,6 +3,12 @@ import { jsq } from "../lib/jsq";
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 const minify = (html: string) => html.replace(/>\s+</g, "><").trim();
 
+type DebugInfo = {
+  slotId: string;
+  blockUuid: string;
+  key: string;
+};
+
 export async function getLocalJsqBlockContents(blockUuid: string) {
   const JSQ_BLOCK_REGEX =
     /^\x60{3}jsq[ \t]*\r?\n([\s\S]*?)\r?\n?^\x60{3}[ \t]*$/m;
@@ -17,14 +23,18 @@ export async function getLocalJsqBlockContents(blockUuid: string) {
   return jsq_block_matches[1];
 }
 
-export async function executeLocalJsq(slotId: string, blockUuid: string) {
+export async function executeLocalJsq(
+  slotId: string,
+  blockUuid: string,
+  key: string,
+) {
   const jsqUserCode = await getLocalJsqBlockContents(blockUuid);
-
+  console.log("GOT USER CODE FOR UUID", blockUuid, jsqUserCode);
   let userFunction;
-  let userFunctionResult;
+  let userFunctionResult: any;
 
   try {
-    userFunction = new AsyncFunction("jsq", "logseq", jsqUserCode);
+    userFunction = new AsyncFunction("jsq", "logseq", "debug", jsqUserCode);
   } catch (e) {
     console.error("jsq block failed to compile:", e);
     renderBlock(
@@ -35,16 +45,23 @@ export async function executeLocalJsq(slotId: string, blockUuid: string) {
     return;
   }
 
+  const debug: DebugInfo = {
+    slotId: slotId,
+    blockUuid: blockUuid,
+    key,
+  };
+
   try {
-    userFunctionResult = await userFunction(jsq, logseq);
+    userFunctionResult = await userFunction(jsq, logseq, debug);
   } catch (e) {
     console.error("jsq block threw:", e);
   }
 
+  console.log("RENDERING code", jsqUserCode, "INTO", slotId, blockUuid);
   renderBlock(slotId, blockUuid, userFunctionResult);
 }
 
-function renderBlock(slotId: string, blockUuid: string, content: string) {
+function renderBlock(slotId: string, key: string, content: any) {
   const toggleId = crypto.randomUUID();
 
   const codeToggle = `<button
@@ -55,7 +72,7 @@ function renderBlock(slotId: string, blockUuid: string, content: string) {
 >show/hide jsq block &lt;/&gt;</button>`;
 
   logseq.provideUI({
-    key: "jsq",
+    key: key,
     slot: slotId,
     reset: true,
     template: minify(`
