@@ -8,6 +8,9 @@ export type Props = { [key: string]: string };
  * Call `headers(row)` to set or replace the optional header, and `row(row)` to
  * append a body row. Both return the table so calls can be chained.
  * You can return the table from a JSQ block directly or call `toString()` to get its HTML.
+ * Tables have theme-aware borders, cell padding, and a header background by
+ * default. Chain `withoutStyle()` to omit JSQ's default table styling;
+ * Logseq, theme, and user styles can still apply.
  *
  * A row is either an array of cells or `{ cells: [...], props: {...} }`.
  * A cell is either a string or `{ content: "...", props: {...} }`.
@@ -38,6 +41,7 @@ export class Table {
   private header?: Row;
   private rows: Row[] = [];
   private errs: string[] = [];
+  private styled = true;
 
   constructor(props?: Props) {
     this.props = props;
@@ -53,14 +57,25 @@ export class Table {
     return this;
   }
 
+  withoutStyle(): this {
+    this.styled = false;
+    return this;
+  }
+
   toString(): string {
     if (this.errs.length > 0) {
       return this.errsAsElements();
     }
 
-    const propsStr = this.props ? ` ${Table.propsToString(this.props)}` : "";
+    const { class: customClass, ...props } = this.props ?? {};
+    const classes = [
+      "jsq-table",
+      ...(this.styled ? ["jsq-table--styled"] : []),
+      ...(customClass ? [customClass] : []),
+    ].join(" ");
+    const propsStr = Table.propsToString({ ...props, class: classes });
 
-    let tableString = `<table class="jsq-table" ${propsStr}> <thead>`;
+    let tableString = `<table ${propsStr}> <thead>`;
 
     const headerString = this.header ? this.rowToString(this.header, "th") : "";
 
@@ -68,9 +83,9 @@ export class Table {
 
     return tableString.concat(
       headerString,
-      "</thead>",
+      "</thead><tbody>",
       ...rowStrings,
-      "</table>",
+      "</tbody></table>",
     );
   }
 

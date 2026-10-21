@@ -2,7 +2,7 @@ import "@logseq/libs";
 import { JsqExecutor } from "./core/executor";
 import { jsq } from "./jsq";
 import { initSettings } from "./settings";
-import { registerStyles } from "./ui/styles";
+import styles from "./ui/styles.css?raw";
 
 function getNewJsqBlock() {
   const uuid = crypto.randomUUID();
@@ -21,6 +21,13 @@ function registerJsqMode() {
     return;
   }
   CM.defineMIME("jsq", "javascript");
+}
+
+function registerStyles(): void {
+  logseq.provideStyle({
+    key: "jsq-styles",
+    style: styles,
+  });
 }
 
 async function main() {

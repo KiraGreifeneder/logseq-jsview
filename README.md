@@ -23,8 +23,9 @@ the JSQ plugin simply lets you use the logseq api (as well as helpers through th
 
 ## Styling
 
-Plugin-owned styles live in [src/ui/styles.ts](./src/ui/styles.ts) and are
-registered once through `logseq.provideStyle()` in Logseq's document. JSQ uses
+Plugin-owned styles live in [src/ui/styles.css](./src/ui/styles.css). The bundler
+loads the CSS as text, and [src/ui/styles.ts](./src/ui/styles.ts) registers it
+once through `logseq.provideStyle()` in Logseq's document. JSQ uses
 `jsq-`-prefixed CSS classes rather than relying on Logseq's utility classes.
 Host slot sizing and code visibility rules target only slots containing JSQ
 output, leaving other plugins' slots alone.
@@ -32,3 +33,24 @@ output, leaving other plugins' slots alone.
 Styles inherit theme colors and use Logseq CSS variables with fallbacks.
 Returned HTML and user-supplied table attributes can still provide their own
 classes and inline styles; these are not rewritten by JSQ.
+
+### Tables
+
+`jsq.table()` includes theme-aware borders, cell padding, and a subtle header
+background by default:
+
+```js
+return jsq.table()
+  .headers(["Task", "Status"])
+  .row(["Publish V1", "Pending"]);
+```
+
+Chain `.withoutStyle()` to disable JSQ's default table appearance, including
+its full-width sizing. This does not reset styles from Logseq or your theme:
+
+```js
+return jsq.table({ class: "my-table" })
+  .withoutStyle()
+  .headers(["Task", "Status"])
+  .row(["Publish V1", "Pending"]);
+```

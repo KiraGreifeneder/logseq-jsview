@@ -1,0 +1,140 @@
+.lsp-hook-ui-slot:has(.jsq-output),
+.lsp-hook-ui-slot:has(.jsq-output) > * {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.block-content:has(.jsq-output) .extensions__code {
+  display: none;
+}
+
+.block-content.jsq-code-open:has(.jsq-output) .extensions__code {
+  display: block;
+}
+
+.jsq-output {
+  --jsq-error-color: #cd5c5c;
+  position: relative;
+  width: 100%;
+  color: var(--ls-primary-text-color, inherit);
+}
+
+.jsq-output__content {
+  position: relative;
+  width: 100%;
+  padding-top: 1.25rem;
+}
+
+.jsq-code-toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 0 0.375rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-family: monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: normal;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 150ms;
+}
+
+.jsq-code-toggle:hover,
+.jsq-code-toggle:focus-visible {
+  opacity: 1;
+}
+
+.jsq-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--ls-border-color, currentColor);
+  border-radius: 0.25rem;
+  background: var(--ls-secondary-background-color, transparent);
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.jsq-button:hover {
+  background: var(--ls-tertiary-background-color, transparent);
+}
+
+.jsq-code-toggle:focus-visible,
+.jsq-button:focus-visible {
+  outline: 2px solid var(--ls-link-text-color, currentColor);
+  outline-offset: 2px;
+}
+
+.jsq-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.jsq-table--styled {
+  width: 100%;
+  margin: 0.5rem 0;
+  border-collapse: collapse;
+  table-layout: auto;
+  color: var(--ls-primary-text-color, inherit);
+  background: var(--ls-primary-background-color, transparent);
+}
+
+.jsq-table--styled > thead > tr > th,
+.jsq-table--styled > tbody > tr > td {
+  border: 1px solid var(--ls-border-color, #888);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.jsq-table--styled > thead > tr > th {
+  background: var(--ls-secondary-background-color, transparent);
+  font-weight: 600;
+}
+
+.jsq-error {
+  color: var(--ls-primary-text-color, inherit);
+  background: var(--ls-primary-background-color, transparent);
+  border: 1px solid var(--jsq-error-color, #cd5c5c);
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.jsq-error .jsq-error__title,
+.jsq-table-error {
+  color: var(--jsq-error-color, #cd5c5c);
+}
+
+.jsq-error .jsq-error__message {
+  color: inherit;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 8px 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.jsq-error__context {
+  opacity: 0.75;
+}
+
+.jsq-error__context code {
+  color: inherit;
+  background: transparent;
+}
