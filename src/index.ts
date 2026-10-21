@@ -23,17 +23,13 @@ function registerJsqMode() {
   CM.defineMIME("jsq", "javascript");
 }
 
-function registerStyles(): void {
+async function main() {
+  initSettings();
+
   logseq.provideStyle({
     key: "jsq-styles",
     style: styles,
   });
-}
-
-async function main() {
-  initSettings();
-
-  registerStyles();
 
   jsq.registerFunction("toggleCode", (e: any) => {
     const doc = top?.document;

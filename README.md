@@ -36,8 +36,8 @@ classes and inline styles; these are not rewritten by JSQ.
 
 ### Tables
 
-`jsq.table()` includes theme-aware borders, cell padding, and a subtle header
-background by default:
+`jsq.table()` adds a 1px underline beneath the header, bold header cells,
+and left-aligned cells:
 
 ```js
 return jsq.table()
@@ -45,8 +45,8 @@ return jsq.table()
   .row(["Publish V1", "Pending"]);
 ```
 
-Chain `.withoutStyle()` to disable JSQ's default table appearance, including
-its full-width sizing. This does not reset styles from Logseq or your theme:
+Chain `.withoutStyle()` to disable JSQ's default table appearance.
+This does not reset styles from Logseq or your theme:
 
 ```js
 return jsq.table({ class: "my-table" })

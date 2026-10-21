@@ -8,14 +8,16 @@ export type Props = { [key: string]: string };
  * Call `headers(row)` to set or replace the optional header, and `row(row)` to
  * append a body row. Both return the table so calls can be chained.
  * You can return the table from a JSQ block directly or call `toString()` to get its HTML.
- * Tables have theme-aware borders, cell padding, and a header background by
- * default. Chain `withoutStyle()` to omit JSQ's default table styling;
+ * Default styling adds a 1px header underline, bold header cells, and
+ * left-aligned cells.
+ * Chain `withoutStyle()` to omit JSQ's default table styling;
  * Logseq, theme, and user styles can still apply.
  *
  * A row is either an array of cells or `{ cells: [...], props: {...} }`.
  * A cell is either a string or `{ content: "...", props: {...} }`.
  * Props are string-valued HTML attributes applied to the table, row, or cell.
  * Header cells render as `<th>`; body cells render as `<td>`.
+ * Invalid rows or cells throw a `TypeError` when added.
  *
  * Cell strings are raw HTML, not escaped text. Convert numbers and other values
  * with `String(value)` and HTML-escape untrusted text before adding it.
@@ -40,7 +42,6 @@ export class Table {
   private props?: Props;
   private header?: Row;
   private rows: Row[] = [];
-  private errs: string[] = [];
   private styled = true;
 
   constructor(props?: Props) {
@@ -48,11 +49,13 @@ export class Table {
   }
 
   headers(header: Row): this {
+    Table.validateRow(header, "header");
     this.header = header;
     return this;
   }
 
   row(row: Row): this {
+    Table.validateRow(row, `row ${this.rows.length + 1}`);
     this.rows.push(row);
     return this;
   }
@@ -63,16 +66,14 @@ export class Table {
   }
 
   toString(): string {
-    if (this.errs.length > 0) {
-      return this.errsAsElements();
-    }
-
     const { class: customClass, ...props } = this.props ?? {};
+
     const classes = [
       "jsq-table",
       ...(this.styled ? ["jsq-table--styled"] : []),
       ...(customClass ? [customClass] : []),
     ].join(" ");
+
     const propsStr = Table.propsToString({ ...props, class: classes });
 
     let tableString = `<table ${propsStr}> <thead>`;
@@ -93,8 +94,33 @@ export class Table {
     return "cells" in row ? row.cells : row;
   }
 
+  private static validateRow(row: unknown, location: string): void {
+    const cells =
+      row && typeof row === "object" && "cells" in row ? row.cells : row;
+    if (!Array.isArray(cells)) {
+      throw new TypeError(
+        `Table ${location}: expected an array of cells or { cells: [...] }.`,
+      );
+    }
+    for (const [index, cell] of cells.entries()) {
+      if (
+        typeof cell !== "string" &&
+        !(cell && typeof cell === "object" && typeof cell.content === "string")
+      ) {
+        throw new TypeError(
+          `Table ${location}, cell ${index + 1}: expected a string or { content: string }.`,
+        );
+      }
+    }
+  }
+
   private static getPropsString(element: Row | Cell) {
-    if (typeof element != "object" || !("props" in element) || !element.props) {
+    if (
+      !element ||
+      typeof element != "object" ||
+      !("props" in element) ||
+      !element.props
+    ) {
       return "";
     }
 
@@ -125,21 +151,16 @@ export class Table {
   private contentFromCell(cell: Cell) {
     if (typeof cell === "string") {
       return cell;
-    } else if (cell.content && typeof cell.content === "string") {
+    } else if (
+      cell &&
+      typeof cell === "object" &&
+      typeof cell.content === "string"
+    ) {
       return cell.content;
     } else {
-      this.errs.push(
-        "Couldn't read non-string cell content; Ensure that all cells contain string representations",
+      throw new TypeError(
+        "Table cell: expected a string or { content: string }.",
       );
-      return "";
     }
-  }
-
-  private errsAsElements() {
-    return this.errs
-      .map(
-        (err, idx) => `<code class="jsq-table-error"> ${idx}: ${err} </code>`,
-      )
-      .join(""); // TODO newlines? or do browsers do this for us
   }
 }
