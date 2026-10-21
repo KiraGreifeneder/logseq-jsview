@@ -7,7 +7,7 @@ Get the working demo ready to publish as a V1 that is reasonably safe:
 1. **Security.** jsq blocks only run in graphs or pages the user has trusted.
 2. **Errors.** Every failure shows up clearly in the rendered block and in the console.
 3. **Typing.** Strict TypeScript, no `any`, and a typed public `jsq` API.
-4. **Structure.** A small, flat layout without circular imports.
+4. **Structure.** Clear `core/`, `api/`, and `ui/` responsibilities without circular imports or a file for every pipeline step.
 
 Out of scope for V1:
 
@@ -39,26 +39,34 @@ Out of scope for V1:
 
 ```
 src/
-  index.ts        bootstrap: settings, styles, slash command, slot listener, re-render hooks
-  settings.ts     settings schema, typed getSettings(), isTrusted(), trustGraph()/trustPage()
-  runner.ts       load → trust → compile → run → normalize → render; JsqError
-  api.ts          the `jsq` object, JsqApi/JsqContext types, model (click handler) registry
+  index.ts        bootstrap, slash command, event wiring, local CodeMirror integration
+  settings.ts     settings schema and typed settings access
+  core/
+    runner.ts     load, trust, compile, execute, normalize, render
+    trust.ts      graph/page identity, approval rules, trust updates
+    errors.ts     error normalization and diagnostic context
+    callbacks.ts  callback registration, dispatch, cleanup
+  api/
+    jsq.ts        assembles the public jsq object; exports JsqApi
+    queries.ts    query and page/block retrieval helpers
   ui/
-    html.ts       escapeHtml/escapeAttr, output wrapper, error panel, trust placeholder, styles
-    table.ts      Table builder (escapes attribute values)
-    button.ts     button() using the registry from api.ts
+    render.ts     output wrapper, error panel, trust placeholder, styles
+    html.ts       shared escaping and attribute helpers
+    table.ts      table builder
+    button.ts     button builder
 ```
 
 Changes from the current layout:
 
-- `core/runner.ts` moves to `runner.ts`.
-- `lib/jsq.ts` moves to `api.ts`.
-- `core/` and `lib/` are deleted.
-- `button.ts` imports the registry from `api.ts`. `api.ts` imports `button`/`Table` only to put them on the `jsq` object. If the cycle still causes trouble, move the registry into `ui/html.ts`.
+- Keep `core/runner.ts`. Loading, compilation, execution, and result normalization remain together initially.
+- Move `lib/jsq.ts` to `api/jsq.ts` and extract its query helpers into `api/queries.ts`. Remove `lib/` once empty.
+- Both `api/jsq.ts` and `ui/button.ts` use `core/callbacks.ts`; the registry never imports the public API. This removes the existing circular import.
+- No `host/`, `api/index.ts` barrel, central `types.ts`, or handwritten `jsq.d.ts`.
+- Keep types beside their owner and export them when needed: `JsqApi` in `api/jsq.ts`, table types in `ui/table.ts`, callback types in `core/callbacks.ts`, settings types in `settings.ts`, execution context in `core/runner.ts`, and diagnostic types in `core/errors.ts`. Use `import type` for type-only dependencies.
 
 ## Design
 
-### 1. Execution trust (`settings.ts`)
+### 1. Execution trust (`settings.ts`, `core/trust.ts`)
 
 Settings are registered with `logseq.useSettingsSchema`. Logseq stores plugin settings outside the graph, so a graph can't mark itself as trusted. **Trust markers inside graph content (for example page properties) are never accepted.**
 
@@ -81,13 +89,13 @@ Rules:
   - **[Trust this graph]**
   - **[Trust this page]** (shown only when the policy is `trustedPages`)
 
-  Each button appends to the setting with `logseq.updateSettings` and then re-renders. A graph can't click these buttons for the user, so that's safe.
-- **Re-rendering:** keep a `Map<slotId, {blockUuid, rendererKey}>` of active slots. On `logseq.onSettingsChanged` and on graph change, run the pipeline again for each slot (drop slots whose element no longer exists).
+  Each button requests approval through plugin-owned confirmation UI identifying the graph/page and warning about unrestricted execution. Treat callback data as untrusted: resolve the target from plugin-owned slot state and re-check the current graph before persisting approval. In `disabled` mode, show instructions to change settings, not approval buttons. This is an execution gate, not a sandbox or a guarantee against deceptive graph content.
+- **Re-rendering:** track active slots with their graph identity and run generation. On trust changes, invalidate pending runs, remove obsolete output and callbacks, and re-evaluate live slots. On graph change, discard old graph slot state rather than resolving its block UUIDs in the new graph. Before execution, callback dispatch, and rendering asynchronous results, re-check that the graph, trust decision, and run generation are still current. Revocation cannot undo side effects of code that has already started.
 
-### 2. Pipeline and errors (`runner.ts`)
+### 2. Pipeline and errors (`core/runner.ts`, `core/errors.ts`)
 
 ```ts
-type Phase = "load" | "compile" | "runtime" | "result";
+type Phase = "load" | "trust" | "compile" | "runtime" | "result" | "render";
 class JsqError extends Error { phase: Phase; blockUuid: string; line?: number; cause?: unknown }
 ```
 
@@ -112,12 +120,13 @@ There is one `catch` for all phases:
 
 Remove all the debug `console.log`s.
 
-### 3. API and typing (`api.ts`, `tsconfig.json`)
+### 3. API and typing (`api/`, `tsconfig.json`)
 
 - Add `tsconfig.json`:
   - `strict`, `noUncheckedIndexedAccess`
   - `target`/`lib`: `ES2022` + `DOM`
   - `module`: `ESNext`, `moduleResolution`: `bundler`, `noEmit`
+  - `verbatimModuleSyntax` to make type-only imports explicit
 
   Add the script `"typecheck": "tsc --noEmit"`.
 - The user-code boundary is `unknown`. Narrow it only through the result normalizer.
@@ -130,35 +139,92 @@ export type JsqApi = typeof jsq;
 
 - Rename the third parameter from `debug` to `ctx`. There are no existing users, so no alias is needed.
 - Queries:
-  - `datascriptQuery<T = unknown>(q: string): Promise<T[]>`
+  - Raw Datalog results default to `unknown`: their shape depends on `:find` (relations, collections, tuples, scalars). Do not promise `T[]` for every query. Validate the specific result shape in higher-level helpers; optional generic annotations are caller assertions, not runtime validation.
   - `simpleQuery(q: string): Promise<BlockEntity[]>`, returning `[]` instead of `null`
   - `pageByName(name: string): Promise<PageEntity | null>`, implemented with `logseq.Editor.getPage(name)` (no string injection, no crash)
   - `allPages(): Promise<PageEntity[]>`, flattening the `[[page]]` tuples
   - `blocksInPage(page: string): Promise<BlockEntity[]>`, returning `[]` instead of `null`
 - Add a `jsq.escape(str)` helper, since cell contents and returned strings are raw HTML.
-- **Model registry:** a single `logseq.provideModel({ jsqDispatch })`. Buttons get `data-on-click="jsqDispatch" data-jsq-handler="<id>"`. Handlers live in `Map<blockUuid, Map<id, fn>>`, and a block's map is cleared before it re-runs, so handlers no longer pile up. `toggleCode` is a built-in handler on the same dispatcher.
+- **Model registry (`core/callbacks.ts`):** a single `logseq.provideModel({ jsqDispatch })`. Buttons get `data-on-click="jsqDispatch" data-jsq-handler="<id>"`. Scope handlers to graph, slot, and run generation, so embeds do not clear each other's handlers. Construct a per-run `jsq` API whose button/registration helpers close over this scope; do not use a mutable global "current block", since scripts can overlap across `await`. Remove handlers on rerun, trust revocation, graph change, and slot disposal. `toggleCode` is a built-in handler on the same dispatcher.
 
-  `jsq.registerFunction(name, fn)` stays for hand-written `data-on-click="name"` markup (the example uses it). Re-registering the same name just replaces it.
+  Prefer scoped dispatch over globally named `provideModel` callbacks. Update the link example to use a registration result containing its dispatch attributes rather than a hard-coded global callback name. With no existing users, this API can change before release.
 - Typed host access: in `index.ts`, declare a local type for `window.parent.CodeMirror` (`{ defineMIME(name: string, mode: string): void }`). Handlers receive `HTMLElement`.
 
-### 4. HTML safety (`ui/html.ts`, `ui/table.ts`)
+### 4. HTML safety (`ui/html.ts`, `ui/render.ts`, `ui/table.ts`)
 
 - Move `escapeAttr` out of `button.ts` into `html.ts` and add `escapeHtml`.
 - Everything the plugin builds (error text, attribute values, JSON output, placeholder text) gets escaped.
 - User-provided content (cells, button labels, returned strings) stays raw HTML on purpose. The README says so.
-- `Table.propsToString` escapes values and rejects invalid attribute names.
+- `Table.propsToString` escapes values and rejects invalid attribute names. This protects HTML structure, not against arbitrary active HTML: raw HTML is supported only after execution approval.
+
+### 5. TypeScript configuration and package scripts
+
+Add this project-root `tsconfig.json` during implementation:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "tsdown.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+- Include the bundler config as well as plugin source. Node types are available for tooling; they do not make Node APIs available inside the plugin's browser runtime.
+- `skipLibCheck` skips checking dependency declaration internals, not type-checking plugin code against their exported types. Revisit it if dependency typing issues need investigation.
+- `strict` catches implicit `any`, but does not prohibit explicit `any`. Review those separately and avoid unnecessary assertions. Turning on strict checks is expected to expose existing code that must be fixed.
+- The existing TypeScript package exposes `tsc`; no new dependencies or compiler-command substitutions are needed.
+
+Change only the scripts section in `package.json`:
+
+```json
+{
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && tsdown",
+    "dev": "tsdown --watch",
+    "test": "node --test"
+  }
+}
+```
+
+Keep the existing test script without adding tests for V1. The development bundler remains fast; optionally run `npm run typecheck -- --watch` in another terminal. Release builds fail if type-checking fails. No dependency or lockfile changes are required.
+
+### 6. Optional generated declarations
+
+TypeScript can generate `.d.ts` files directly from the implementation using `declaration` and `emitDeclarationOnly`. A declaration-emitting configuration must override this project's `noEmit: true` with `noEmit: false`.
+
+Do not maintain handwritten duplicates of the public API types. Export `JsqApi` from `api/jsq.ts` (derived from the actual API object or per-run API factory), along with relevant public types.
+
+Declaration distribution is optional and not a V1 prerequisite. If added later:
+
+- Use a separate declaration build rooted at `src/`, emitting to a dedicated output directory, or use tsdown declaration generation.
+- The current tsdown setting `dts: false` intentionally disables declarations. Enabling `dts: true` for the plugin startup entry alone does not establish a useful scripting API entry point; configure an API entry and include all referenced declarations.
+- Check that the distributed types can be consumed without plugin startup side effects and without unavailable internal imports.
+- Add a package `types`/export mapping only when actually distributing an importable API entry. Do not point it at a nonexistent declaration file.
+- Generated declarations help external script editors; they do not automatically provide autocomplete in Logseq's code editor, validate user JavaScript at runtime, or replace project type-checking.
 
 ## Implementation steps
 
-1. **Tooling:** add `tsconfig.json` and the `typecheck` script. Fix the type errors this reveals only as far as the build needs.
-2. **Flatten the layout:** move the files into the target structure, add `ui/html.ts`, and fix imports. Behavior stays the same.
+1. **Tooling:** add the configuration and scripts above. Fix the type errors rather than relaxing strictness or hiding them behind casts.
+2. **Organize the layout:** keep `core/`, introduce `api/`, separate rendering and HTML helpers, and fix imports without changing behavior.
 3. **Pipeline and errors:** add `JsqError` and phases, rewrite `runner.ts` as `runJsqSlot`, add result normalization, the error panel and console reporting, and remove the debug logs.
 4. **API typing:** typed queries, `pageByName` via `getPage`, `JsqContext`/`ctx`, model registry plus `jsqDispatch`, and the `button`/`toggleCode` changes. Remove the remaining `any`s.
 5. **Settings and trust:** schema, `isTrusted`, placeholder with trust buttons, the active-slot map and re-rendering on settings or graph change.
 6. **Examples and docs:**
-   - Update the examples: use `ctx`, fix the implicit global `for (d of …)` with `const d`, and add `?.` around properties that may be missing.
+   - Update the examples: use `ctx`, scoped link callbacks, and `const d` in loops. Handle missing properties explicitly rather than hiding invalid input behind optional chaining.
    - Add README sections on the security model and settings, how errors appear, the API reference, and "returned strings are raw HTML".
-   - Fix the plugin id mismatch (`jqs` repo vs `jsq` id) if you want to.
 
 Order: 1 → 2 → 3, and 4 can be done alongside 3. Step 5 needs 3, because the placeholder uses the same render path. Step 6 comes last.
 
@@ -177,9 +243,11 @@ Order: 1 → 2 → 3, and 4 can be done alongside 3. Step 5 needs 3, because the
 - [Trust this graph] renders the blocks right away and is still trusted after restarting Logseq.
 - `trustedPages` mode: a trusted page runs, an untrusted page and that page's namespace children show the placeholder, and [Trust this page] works.
 - Switching to another graph re-evaluates trust. `disabled` blocks everything.
+- Trusting or revoking one page does not affect its namespace children. Test page-only approval without a graph-wide grant.
+- Switch graphs or revoke trust while a script is awaiting a promise: its obsolete output must not render and its callbacks must not remain usable. Already-started code cannot be forcibly stopped.
 - Error panels with a useful message show up for:
-  - a syntax error (compile, with line number)
-  - `throw new Error("x")` (runtime, with line number)
+  - a syntax error (compile, with line information only when reliably available)
+  - `throw new Error("x")` (runtime, with verified line mapping)
   - a missing `return` (hint)
   - a block with the renderer macro but no code fence (load)
   - `jsq.pageByName("doesnotexist")` (returns `null`, no crash)

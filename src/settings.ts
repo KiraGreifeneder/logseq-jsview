@@ -1,6 +1,7 @@
 import "@logseq/libs";
-import { SettingSchemaDesc } from "@logseq/libs/dist/LSPlugin";
+import type { SettingSchemaDesc } from "@logseq/libs/dist/LSPlugin";
 
+// TODO use a dropdown instead, previously opened graph paths are stored by logseq somewhere
 export const settingsSchema: SettingSchemaDesc[] = [
   {
     key: "trustedPaths",

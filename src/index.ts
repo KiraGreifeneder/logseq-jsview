@@ -45,9 +45,41 @@ function provideJsqBlockStyles() {
   });
 }
 
+// TODO Wtf you can do better than this lol
+async function getCleanGraphPath() {
+  let rawPath = (await logseq.App.getUserConfigs()).currentGraph.split("/");
+  rawPath.shift();
+  return "/" + rawPath.join("/");
+}
+
+async function checkTrust() {
+  const trustedPaths = logseq.settings?.["trustedPaths"] as string[];
+
+  if (trustedPaths) {
+    const graphPath = await getCleanGraphPath();
+
+    console.log("JSQ ", trustedPaths.join(), graphPath);
+
+    for (const path of trustedPaths) {
+      if (path === graphPath) return true;
+    }
+  }
+
+  logseq.UI.showMsg(
+    "JSQ: Current graph is not trusted! See settings for more info.",
+    "error",
+  );
+
+  return false;
+}
+
 async function main() {
   initSettings();
+
   provideJsqBlockStyles();
+  if (!(await checkTrust())) {
+    return;
+  }
 
   jsq.registerFunction("toggleCode", (e: any) => {
     const doc = top?.document;
