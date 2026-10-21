@@ -51,7 +51,7 @@ Whatever is returned by the function (which should have a string representation)
 
 Click the hide/show button to collapse the codeblock when you don't want to see it or reveal it again. It's closed by default.
 
-![example of a JSV block](assets/image-1.png)
+![example of a jsv block](assets/intro-example.png)
 
 At the moment all JSV blocks are run on launch, and again whenever the code inside it is updated.
 The ID in the render block must be unique! Therefore I'd recommend only using the command to create JSV blocks. 
