@@ -1,7 +1,8 @@
 import "@logseq/libs";
-import { jsq } from "./api/jsq";
 import { JsqExecutor } from "./core/executor";
+import { jsq } from "./jsq";
 import { initSettings } from "./settings";
+import { registerStyles } from "./ui/styles";
 
 function getNewJsqBlock() {
   const uuid = crypto.randomUUID();
@@ -22,33 +23,10 @@ function registerJsqMode() {
   CM.defineMIME("jsq", "javascript");
 }
 
-function provideJsqBlockStyles() {
-  logseq.provideStyle({
-    key: "hide-jsq-code",
-    style: `
-    .block-content:has(.lsp-hook-ui-slot) .extensions__code {
-      display: none;
-    }
-    .block-content.jsq-code-open .extensions__code {
-      display: block;
-    }
-  `,
-  });
-
-  logseq.provideStyle({
-    key: "jsq-table-width",
-    style: `
-    .lsp-hook-ui-slot,
-    .lsp-hook-ui-slot > * { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
-    .lsp-hook-ui-slot table { width: 100% !important; }
-  `,
-  });
-}
-
 async function main() {
   initSettings();
 
-  provideJsqBlockStyles();
+  registerStyles();
 
   jsq.registerFunction("toggleCode", (e: any) => {
     const doc = top?.document;

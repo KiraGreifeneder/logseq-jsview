@@ -19,8 +19,16 @@ The goal of this plugin is not:
 - to be as efficient as possible
 - to write Datalog queries for you
 
-the JSQ plugin simply lets you treat your graph as a hierarchy of
- pages -> blocks -> block contents
-and to give you the freedom to do whatever you'd like with that :)
+the JSQ plugin simply lets you use the logseq api (as well as helpers through the JSQ api) and do whatever you want with your graph/pages/blocks :)
 
-## 
+## Styling
+
+Plugin-owned styles live in [src/ui/styles.ts](./src/ui/styles.ts) and are
+registered once through `logseq.provideStyle()` in Logseq's document. JSQ uses
+`jsq-`-prefixed CSS classes rather than relying on Logseq's utility classes.
+Host slot sizing and code visibility rules target only slots containing JSQ
+output, leaving other plugins' slots alone.
+
+Styles inherit theme colors and use Logseq CSS variables with fallbacks.
+Returned HTML and user-supplied table attributes can still provide their own
+classes and inline styles; these are not rewritten by JSQ.

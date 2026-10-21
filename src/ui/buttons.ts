@@ -1,12 +1,4 @@
-import { jsq } from "../api/jsq";
-
-const buttonStyleClasses = [
-  "ui__button",
-  "font-medium",
-  "text-xs",
-  "rounded",
-  "px-3",
-].join(" ");
+import { jsq } from "../jsq";
 
 type DataValue = string | number | boolean | object | null | undefined;
 
@@ -37,7 +29,7 @@ export function button(
   onclick: (...args: any[]) => void,
   data: Record<string, DataValue> = {},
 ) {
-  const attrs: string[] = [`class="${buttonStyleClasses}"`];
+  const attrs: string[] = [`class="jsq-button"`];
 
   // add onclick function
   const uuid = crypto.randomUUID();
@@ -70,6 +62,6 @@ export function uniqueCodeToggleBtn() {
         data-on-click="toggleCode"
         data-toggle-id="${toggleId}"
         title="Show/hide code"
-        class="absolute top-0 left-0 z-10 px-1.5 text-xs font-mono opacity-30 hover:opacity-100 transition-opacity cursor-pointer bg-transparent"
+        class="jsq-code-toggle"
       >show/hide jsq block &lt;/&gt;</button>`;
 }

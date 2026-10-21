@@ -1,11 +1,11 @@
 /**
- * Represents the public interface for jsq.
+ * Represents the public API for JSQ.
  * All functions here are exported and provided through the `jsq` in their codeblocks.
  */
 
 import type { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
-import { button } from "../ui/buttons";
-import { type Props, Table } from "../ui/table";
+import { button } from "./ui/buttons";
+import { type Props, Table } from "./ui/table";
 
 async function datascriptQuery(query: string) {
   return await logseq.DB.datascriptQuery(query);

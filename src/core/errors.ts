@@ -34,10 +34,10 @@ export class JsqError extends Error {
           : String(this.cause);
 
     return `
-      <div role="alert" style="border:1px solid #cd5c5c;border-left-width:4px;border-radius:6px;padding:12px 16px">
-        <strong style="color:#cd5c5c">JSQ error · ${escapeHtml(this.phase)}</strong>
-        <pre style="margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere">${escapeHtml(message)}</pre>
-        <small style="opacity:0.75">Block: <code>${escapeHtml(this.blockUuid)}</code></small>
+      <div role="alert" class="jsq-error">
+        <strong class="jsq-error__title">JSQ error · ${escapeHtml(this.phase)}</strong>
+        <pre class="jsq-error__message">${escapeHtml(message)}</pre>
+        <small class="jsq-error__context">Block: <code>${escapeHtml(this.blockUuid)}</code></small>
       </div>
     `;
   }

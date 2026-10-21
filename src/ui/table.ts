@@ -58,7 +58,9 @@ export class Table {
 
   private errsAsElements() {
     return this.errs
-      .map((err, idx) => `<code style="color:red"> ${idx}: ${err} </code>`)
+      .map(
+        (err, idx) => `<code class="jsq-table-error"> ${idx}: ${err} </code>`,
+      )
       .join(""); // TODO newlines? or do browsers do this for us
   }
 
@@ -83,7 +85,7 @@ export class Table {
 
     const propsStr = this.props ? ` ${Table.propsToString(this.props)}` : "";
 
-    let tableString = `<table class="table-auto" ${propsStr}> <thead>`;
+    let tableString = `<table class="jsq-table" ${propsStr}> <thead>`;
 
     const headerString = this.header ? this.rowToString(this.header, "th") : "";
 

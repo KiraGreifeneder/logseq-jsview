@@ -1,4 +1,4 @@
-import { jsq } from "../api/jsq";
+import { jsq } from "../jsq";
 import { uniqueCodeToggleBtn } from "../ui/buttons";
 import { JsqError } from "./errors";
 import { checkTrust } from "./trust";
@@ -112,9 +112,9 @@ export class JsqExecutor {
       slot: this.slotId,
       reset: true,
       template: minify(`
-    <div class="relative w-full">
+    <div class="jsq-output">
       ${uniqueCodeToggleBtn()}
-      <div class="relative w-full mt-5">${content}</div>
+      <div class="jsq-output__content">${content}</div>
     </div>
   `),
     });
