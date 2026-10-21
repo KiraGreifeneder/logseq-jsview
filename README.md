@@ -16,6 +16,15 @@ This is still an early release, so please back up your graph before trying it.
 
 In the future: Install through the Logseq's plugin store.
 
+Or to install manually:
+
+```
+git clone https://github.com/KiraGreifeneder/logseq-jsview.git
+cd logseq-jsview
+npm install && npm run build
+```
+
+
 ### Trusted Graphs
 
 Before JSView can execute code in a graph, the user needs to mark the graph as *trusted* by adding its path to trustedPaths in the plugin settings.
