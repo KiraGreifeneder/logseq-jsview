@@ -1,14 +1,7 @@
-import { jsv } from "../jsv";
+import { registerButton, type Callback } from "../core/callbacks";
+import { escapeHtml } from "./html";
 
 type DataValue = string | number | boolean | object | null | undefined;
-
-const escapeAttr = (value: string): string =>
-  value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 
 // blockUuid -> block-uuid, so it round-trips to dataset.blockUuid
 const toKebab = (key: string): string =>
@@ -19,17 +12,11 @@ const serialize = (value: object | string | number | boolean): string =>
 
 export function button(
   text: string,
-  onclick: (...args: any[]) => void,
+  onclick: Callback,
   data: Record<string, DataValue> = {},
+  scope?: string,
 ) {
   const attrs: string[] = [`class="jsv-button"`];
-
-  // add onclick function
-  const uuid = crypto.randomUUID();
-  const fnName = `custom-btn-fn-${uuid}`;
-  jsv.registerFunction(fnName, onclick);
-
-  attrs.push(`data-on-click="${fnName}"`);
 
   for (const [key, value] of Object.entries(data)) {
     if (value == null) continue; // skip null and undefined
@@ -38,13 +25,15 @@ export function button(
     if (!/^[a-z][a-z0-9-]*$/.test(name)) {
       throw new Error(`Invalid data attribute name: "${key}"`);
     }
-    if (name === "on-click") {
-      throw new Error(`"onClick" is reserved; use the onclickFnName parameter`);
+    if (name === "on-click" || name === "jsv-handler") {
+      throw new Error(`"${key}" is reserved for JSView's click handler`);
     }
 
-    attrs.push(`data-${name}="${escapeAttr(serialize(value))}"`);
+    attrs.push(`data-${name}="${escapeHtml(serialize(value))}"`);
   }
 
+  const id = registerButton(onclick, scope);
+  attrs.push(`data-on-click="jsvDispatch"`, `data-jsv-handler="${id}"`);
   return `<button ${attrs.join(" ")}>${text}</button>`;
 }
 

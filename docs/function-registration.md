@@ -22,6 +22,7 @@ There's no unregister function returned at the moment.
 One thing to keep in mind: names are shared across blocks. If you reuse one,
 it replaces the previous callback. I'd recommend giving your functions
 distinct names, and leaving `toggleCode` alone as JSView uses that internally.
+`jsvDispatch` is reserved for button callbacks and can't be registered manually.
 
 ## Passing data
 
@@ -49,10 +50,15 @@ serialization for you.
 
 ## Current limits
 
-Callback cleanup still needs some work. Functions are registered globally,
-not just for one block or run, and aren't automatically removed on rerender :/
-`jsv.button()` also creates a new callback name each time you call it.
-Registration doesn't isolate the function or restrict what it can do.
+Callbacks registered through your block's `jsv` API are released when that
+slot reruns, disappears, or the graph changes. Failed runs release their
+callbacks too. Button callbacks use one shared dispatcher rather than adding
+a new Logseq model function for every button.
+
+Named callbacks still share names across blocks. Their small Logseq forwarding
+functions stay registered, but no longer hold your script's callback after
+cleanup. You can reuse a name on later runs.
+Registration doesn't isolate a function or restrict what it can do.
 
 If a click handler fails, have a look in the console. These functions run after
 the block has rendered, so their errors don't appear in the script error panel.

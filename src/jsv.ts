@@ -1,5 +1,6 @@
 import type { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
 import { button } from "./ui/buttons";
+import { registerFunction } from "./core/callbacks";
 import { type Props, Table } from "./ui/table";
 
 async function datascriptQuery<T = unknown>(
@@ -27,31 +28,15 @@ async function allPages(): Promise<PageEntity[]> {
 }
 
 async function pageByName(name: string): Promise<PageEntity | undefined> {
-  const pageByNameQuery = `
-      [
-        :find (pull ?p [*])
-        :where
-          [?p :block/name "${name.toLowerCase()}"]
-      ]`;
-
-  const matches: PageEntity[][] =
-    await logseq.DB.datascriptQuery(pageByNameQuery);
-
-  return matches[0] && matches[0][0];
+  return (await logseq.Editor.getPage(name)) ?? undefined;
 }
 
-async function blocksInPage(pageUuid: string): Promise<BlockEntity[]> {
-  return await logseq.Editor.getPageBlocksTree(pageUuid);
+function blocksInPage(pageUuid: string): Promise<BlockEntity[]> {
+  return logseq.Editor.getPageBlocksTree(pageUuid);
 }
 
 function table(props?: Props) {
   return new Table(props);
-}
-
-function registerFunction(name: string, func: Function) {
-  logseq.provideModel({
-    [name]: func,
-  });
 }
 
 export const jsv = {

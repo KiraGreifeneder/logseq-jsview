@@ -129,7 +129,7 @@ Data values can be strings, numbers, booleans, objects, `null`, or `undefined`:
 - `null` and `undefined` are skipped.
 - Attribute values are HTML-escaped.
 
-Please leave `onClick` out of the data object, as JSView uses that attribute
+Please leave `onClick` and `jsvHandler` out of the data object, as JSView uses those attributes
 to wire up the button. Invalid attribute names will give you an error.
 Objects also need to be JSON-serializable, so circular objects won't work.
 

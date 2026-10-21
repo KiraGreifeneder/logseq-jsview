@@ -1,7 +1,8 @@
 {
   "name": "logseq-jsv",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "description": "A logseq plugin that abstracts and simplifies data retrieval and display through javascript.",
   "main": "dist/index.js",

@@ -85,8 +85,8 @@ return `Found ${pages.length} pages`;
 
 ## `jsv.pageByName(name)`
 
-Finds a page by name. The name is lowercased before querying.
-Returns the first page found, or `undefined` for an empty result.
+Finds a page by name through `logseq.Editor.getPage()`.
+Returns the page, or `undefined` if it doesn't exist.
 
 ```js
 const page = await jsv.pageByName("Projects");
@@ -94,10 +94,6 @@ if (!page) throw new Error("Couldn't find Projects");
 
 return `Page UUID: ${page.uuid}`;
 ```
-
-There's still a rough edge here: the name is inserted into the query without
-escaping, so page names containing quotes may not work.
-The helper also expects Logseq to return an array.
 
 ## `jsv.blocksInPage(pageUuid)`
 

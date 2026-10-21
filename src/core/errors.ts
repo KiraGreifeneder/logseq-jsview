@@ -1,4 +1,6 @@
-type Phase = "load" | "trust" | "compile" | "runtime" | "result" | "render";
+import { escapeHtml } from "../ui/html";
+
+export type Phase = "load" | "trust" | "compile" | "runtime" | "result" | "render";
 export class JsvError extends Error {
   constructor(
     public phase: Phase,
@@ -10,22 +12,6 @@ export class JsvError extends Error {
   }
 
   public toHtmlElement(): string {
-    const escapeHtml = (value: string): string =>
-      value.replace(/[&<>"']/g, (character) => {
-        switch (character) {
-          case "&":
-            return "&amp;";
-          case "<":
-            return "&lt;";
-          case ">":
-            return "&gt;";
-          case '"':
-            return "&quot;";
-          default:
-            return "&#39;";
-        }
-      });
-
     const message =
       this.cause instanceof Error
         ? this.cause.message

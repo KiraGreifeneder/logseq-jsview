@@ -1,6 +1,7 @@
 import { jsv } from "../jsv";
-import { uniqueCodeToggleBtn } from "../ui/buttons";
-import { JsvError } from "./errors";
+import { button, uniqueCodeToggleBtn } from "../ui/buttons";
+import { JsvError, type Phase } from "./errors";
+import { clearCallbacks, registerFunction, type Callback } from "./callbacks";
 import { checkTrust } from "./trust";
 
 type DebugInfo = {
@@ -20,10 +21,6 @@ type AsyncFunctionConstructor = new (...args: string[]) => CompiledJsv;
 const AsyncFunction = Object.getPrototypeOf(async function () {})
   .constructor as AsyncFunctionConstructor;
 
-function minify(html: string): string {
-  return html.replace(/>\s+</g, "><").trim();
-}
-
 /**
  * One instance of JsvExecutor should be created for each JSView Block/slot.
  * Holds the block and slot information and runs through the pipeline of loading, compiling and running the user's code.
@@ -40,21 +37,38 @@ export class JsvExecutor {
    * executes through the whole "load -> compile -> run -> render" pipeline.
    */
   public async execute() {
+    let phase: Phase = "load";
+    clearCallbacks(this.slotId);
     try {
       const code = await this.load();
+      phase = "trust";
       if (!(await checkTrust())) return;
+      phase = "compile";
       const func = this.compile(code);
+      phase = "runtime";
       const result = await this.run(func);
-      this.render(result);
+      phase = "result";
+      const content = String(result);
+      phase = "render";
+      this.render(content);
     } catch (cause) {
+      clearCallbacks(this.slotId);
       console.error("[jsv]", this.blockUuid, cause);
 
       const error =
         cause instanceof JsvError
           ? cause
-          : new JsvError("runtime", this.blockUuid, cause);
+          : new JsvError(phase, this.blockUuid, cause);
 
-      this.render(error.toHtmlElement());
+      try {
+        this.render(error.toHtmlElement());
+      } catch (renderError) {
+        console.error("[jsv] Failed to render error panel", renderError);
+        await logseq.UI.showMsg(
+          `JSView: ${error.message}. Couldn't display the error panel; see the console.`,
+          "error",
+        );
+      }
     }
   }
 
@@ -69,7 +83,7 @@ export class JsvExecutor {
     const block = await logseq.Editor.getBlock(this.blockUuid);
     const jsv_block_matches = block?.content?.match(JSV_BLOCK_REGEX);
 
-    if (!jsv_block_matches?.[1]) {
+    if (jsv_block_matches?.[1] === undefined) {
       throw new JsvError("load", this.blockUuid, "No valid JSView Block found.");
     }
 
@@ -93,9 +107,14 @@ export class JsvExecutor {
    * @param func an async function that returns something unknown, to be handled by the user...
    */
   private async run(func: CompiledJsv) {
-    let result;
     try {
-      result = await func(jsv, logseq, {
+      const api: typeof jsv = {
+        ...jsv,
+        button: (text, onclick, data) => button(text, onclick, data, this.slotId),
+        registerFunction: (name: string, callback: Callback) =>
+          registerFunction(name, callback, this.slotId),
+      };
+      return await func(api, logseq, {
         slotId: this.slotId,
         blockUuid: this.blockUuid,
         key: this.key,
@@ -103,20 +122,14 @@ export class JsvExecutor {
     } catch (cause) {
       throw new JsvError("runtime", this.blockUuid, cause);
     }
-    return result;
   }
 
-  private render(content: unknown) {
+  private render(content: string) {
     logseq.provideUI({
       key: this.key,
       slot: this.slotId,
       reset: true,
-      template: minify(`
-    <div class="jsv-output">
-      ${uniqueCodeToggleBtn()}
-      <div class="jsv-output__content">${content}</div>
-    </div>
-  `),
+      template: `<div class="jsv-output">${uniqueCodeToggleBtn()}<div class="jsv-output__content">${content}</div></div>`,
     });
   }
 }
