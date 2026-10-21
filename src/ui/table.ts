@@ -1,94 +1,34 @@
-/** A string of HTML, or HTML with attributes for its cell. */
 export type Cell = { content: string; props?: Props } | string;
-/** An array of cells, optionally with attributes for the row. */
 export type Row = { cells: Cell[]; props?: Props } | Cell[];
-/** HTML attributes with string values, e.g. `{ title: "Details" }`. */
 export type Props = { [key: string]: string };
 
-/**
- * Builds an HTML table through `jsv.table(tableProps?)`.
- *
- * Call `headers(row)` to set or replace the optional header, and `row(row)` to
- * append a body row. Both return the table so calls can be chained.
- * You can return the table from a JSView block directly or call `toString()` to get its HTML.
- * Default styling adds a 1px header underline, bold header cells, and
- * left-aligned cells.
- * Chain `withoutStyle()` to omit JSView's default table styling;
- * Logseq, theme, and user styles can still apply.
- *
- * A row is either an array of cells or `{ cells: [...], props: {...} }`.
- * A cell is either a string or `{ content: "...", props: {...} }`.
- * Props are string-valued HTML attributes applied to the table, row, or cell.
- * Header cells render as `<th>`; body cells render as `<td>`.
- * Invalid rows or cells throw a `TypeError` when added.
- *
- * Cell strings are raw HTML, not escaped text. Convert numbers and other values
- * with `String(value)` and HTML-escape untrusted text before adding it.
- * Attribute names and values are currently inserted without escaping as well,
- * so please only supply trusted attributes.
- *
- * @example
- * const table = jsv.table({ style: "border-collapse: collapse" })
- *   .headers(["Task", "Status"])
- *   .row(["Write docs", "Done"])
- *   .row({
- *     cells: [
- *       { content: "<strong>Publish V1</strong>", props: { title: "Next step" } },
- *       "Pending",
- *     ],
- *     props: { style: "font-weight: bold" },
- *   });
- *
- * return table;
- */
 export class Table {
   private props?: Props;
   private header?: Row;
   private rows: Row[] = [];
   private styled = true;
 
-  /** Creates a table with optional HTML attributes. Usually called through `jsv.table()`. */
   constructor(props?: Props) {
     this.props = props;
   }
 
-  /**
-   * Sets the header row. Calling this again replaces the previous header.
-   * @returns This table, so you can chain calls.
-   * @throws {TypeError} If the row or any of its cells has an invalid shape.
-   */
   headers(header: Row): this {
     Table.validateRow(header, "header");
     this.header = header;
     return this;
   }
 
-  /**
-   * Adds a body row. Cells must be strings or `{ content: string, props?: {...} }`.
-   * Convert numbers with `String(value)` first.
-   * @returns This table, so you can chain calls.
-   * @throws {TypeError} If the row or any of its cells has an invalid shape.
-   */
   row(row: Row): this {
     Table.validateRow(row, `row ${this.rows.length + 1}`);
     this.rows.push(row);
     return this;
   }
 
-  /**
-   * Disables JSView's default table styling.
-   * Styles from Logseq, your theme, and your own attributes can still apply.
-   * @returns This table, so you can chain calls.
-   */
   withoutStyle(): this {
     this.styled = false;
     return this;
   }
 
-  /**
-   * Returns the table as HTML. You can also return the table itself from a block.
-   * Cell contents and attributes aren't HTML-escaped.
-   */
   toString(): string {
     const { class: customClass, ...props } = this.props ?? {};
 

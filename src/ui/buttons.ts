@@ -17,23 +17,6 @@ const toKebab = (key: string): string =>
 const serialize = (value: object | string | number | boolean): string =>
   typeof value === "object" ? JSON.stringify(value) : String(value);
 
-/**
- * Creates a button and registers its click callback for you.
- * Return the HTML directly, or put it in a table cell.
- *
- * @param text - Button label. This is raw HTML, so escape untrusted text yourself.
- * @param onclick - Called by Logseq when clicked. Read data from `e.dataset`.
- * @param data - Optional `data-*` attributes. `blockUuid` becomes `data-block-uuid`
- * and is available as `e.dataset.blockUuid`. Objects are JSON-serialized; other
- * values become strings. `null` and `undefined` are skipped. Values are escaped.
- * @returns The button's HTML.
- * @throws If a data attribute name is invalid or uses the reserved `onClick` key.
- *
- * @example
- * return jsv.button("Open page", (e) => {
- *   logseq.App.pushState("page", { name: e.dataset.pageName });
- * }, { pageName: "projects" });
- */
 export function button(
   text: string,
   onclick: (...args: any[]) => void,

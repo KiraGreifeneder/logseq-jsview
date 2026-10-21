@@ -36,7 +36,7 @@ For example:
 
 ### Creating JSView blocks
 
-Use the command "create new JSV block" (type "/" and enter the command) to create a new block.
+Use the command "New in-line JSView" (type "/" and enter the command) to create a new block.
 It should insert something like this:
 
 ![an empty JSV block](assets/image.png)
@@ -54,6 +54,7 @@ Click the hide/show button to collapse the codeblock when you don't want to see 
 ![example of a JSV block](assets/image-1.png)
 
 At the moment all JSV blocks are run on launch, and again whenever the code inside it is updated.
+The ID in the render block must be unique! Therefore I'd recommend only using the command to create JSV blocks. 
 
 Have fun!
 
@@ -71,36 +72,10 @@ The goal of this plugin is not:
 
 the JSView plugin simply lets you use the logseq api (as well as helpers through the JSView api) and do whatever you want with your graph/pages/blocks :)
 
-## Styling
+## Documentation
 
-Plugin-owned styles live in [src/ui/styles.css](./src/ui/styles.css). The bundler
-loads the CSS as text, and [src/index.ts](./src/index.ts) registers it
-once through `logseq.provideStyle()` in Logseq's document. JSView uses
-`jsv-`-prefixed CSS classes rather than relying on Logseq's utility classes.
-Host slot sizing and code visibility rules target only slots containing JSView
-output, leaving other plugins' slots alone.
-
-Styles inherit theme colors and use Logseq CSS variables with fallbacks.
-Returned HTML and user-supplied table attributes can still provide their own
-classes and inline styles; these are not rewritten by JSView.
-
-### Tables
-
-`jsv.table()` adds a 1px underline beneath the header, bold header cells,
-and left-aligned cells:
-
-```js
-return jsv.table()
-  .headers(["Task", "Status"])
-  .row(["Publish V1", "Pending"]);
-```
-
-Chain `.withoutStyle()` to disable JSView's default table appearance.
-This does not reset styles from Logseq or your theme:
-
-```js
-return jsv.table({ class: "my-table" })
-  .withoutStyle()
-  .headers(["Task", "Status"])
-  .row(["Publish V1", "Pending"]);
-```
+- [Overview](./docs/overview.md)
+- [Queries](./docs/queries.md)
+- [UI: tables, buttons, and styling](./docs/ui.md)
+- [Function registration](./docs/function-registration.md)
+- [Logseq data and query results](./docs/logseq-api.md)
