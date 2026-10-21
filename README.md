@@ -2,10 +2,60 @@
 
 This Logseq plugin allows you to 
 
-- [x] Query and process pages in your graph through an intuitive Javascript API
-- [x] Process your pages as JSON objects
-- [X] Render arbitrary output from a codeblock directly on your page
-- [x] Run javascript functions from your own scripts inside Logseq's context to automate whatever you want
+- Query and process pages in your graph through JSView API (or directly through the LogSeq API)
+- Process your pages as JSON objects
+- Render arbitrary output from a javascript codeblock directly on your page
+- Easily create tables and buttons with the built-in JSView
+
+## Getting Started
+
+Install through the Logseq's plugin store, or clone and run `npm run build`
+
+### Trusted Graphs
+
+Before JSView can execute code in a graph, the user needs to mark the graph as *trusted* by adding its path to trustedPaths in the plugin settings.
+
+This is a security measure to prevent JSView blocks in foreign graphs from running automatically and potentially doing damage to your system.
+**Only approve graphs whose code you trust.**
+
+
+Go to settings > plugins > JSView > Trusted Graphs > edit settings.json 
+
+For example:
+
+```JSON
+{
+  "trustedPaths": [
+    "/home/agc/repos/my-graph"
+  ],
+  "disabled": false
+}
+```
+
+> Please use the absolute path!
+
+### Creating JSView blocks
+
+Use the command "create new JSV block" (type "/" and enter the command) to create a new block.
+It should insert something like this:
+
+![an empty JSV block](assets/image.png)
+
+You can click out of it and enter anything you want in the codeblock.
+This code is run as the body of an `async` function, so you can use `await` and all of logseq's api.
+
+The JSView API is passed to the function as `jsv`, and the logseq api is passed simply as `logseq`.
+See the [docs](./docs/) for more info on these.
+
+Whatever is returned by the function (which should have a string representation) is rendered.
+
+Click the hide/show button to collapse the codeblock when you don't want to see it or reveal it again. It's closed by default.
+
+![example of a JSV block](assets/image-1.png)
+
+At the moment all JSV blocks are run on launch, and again whenever the code inside it is updated.
+
+Have fun!
 
 ## Why?
 
