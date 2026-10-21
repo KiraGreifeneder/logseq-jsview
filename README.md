@@ -12,7 +12,15 @@ This Logseq plugin allows you to
 
 ## Getting Started
 
-Install through the Logseq's plugin store, or clone and run `npm run build`
+Install through the Logseq's plugin store.
+
+Or to install manually:
+
+```
+git clone https://github.com/KiraGreifeneder/logseq-jsview.git
+cd logseq-jsview
+npm install && npm run build
+```
 
 ### Trusted Graphs
 
