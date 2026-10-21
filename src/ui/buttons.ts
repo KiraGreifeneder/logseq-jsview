@@ -1,4 +1,4 @@
-import { jsq } from "../lib/jsq";
+import { jsq } from "../api/jsq";
 
 const buttonStyleClasses = [
   "ui__button",
@@ -26,7 +26,7 @@ const serialize = (value: object | string | number | boolean): string =>
   typeof value === "object" ? JSON.stringify(value) : String(value);
 
 /**
- *
+ * Returns a general-purpose button with an onclick function, as well as any data you pass to it.
  * @param text
  * @param onclickFnName
  * @param data
@@ -61,4 +61,15 @@ export function button(
   }
 
   return `<button ${attrs.join(" ")}>${text}</button>`;
+}
+
+export function uniqueCodeToggleBtn() {
+  const toggleId = crypto.randomUUID();
+
+  return `<button
+        data-on-click="toggleCode"
+        data-toggle-id="${toggleId}"
+        title="Show/hide code"
+        class="absolute top-0 left-0 z-10 px-1.5 text-xs font-mono opacity-30 hover:opacity-100 transition-opacity cursor-pointer bg-transparent"
+      >show/hide jsq block &lt;/&gt;</button>`;
 }

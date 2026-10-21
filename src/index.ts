@@ -1,6 +1,6 @@
 import "@logseq/libs";
-import { executeLocalJsq } from "./core/runner";
-import { jsq } from "./lib/jsq";
+import { jsq } from "./api/jsq";
+import { JsqExecutor } from "./core/executor";
 import { initSettings } from "./settings";
 
 function getNewJsqBlock() {
@@ -45,41 +45,10 @@ function provideJsqBlockStyles() {
   });
 }
 
-// TODO Wtf you can do better than this lol
-async function getCleanGraphPath() {
-  let rawPath = (await logseq.App.getUserConfigs()).currentGraph.split("/");
-  rawPath.shift();
-  return "/" + rawPath.join("/");
-}
-
-async function checkTrust() {
-  const trustedPaths = logseq.settings?.["trustedPaths"] as string[];
-
-  if (trustedPaths) {
-    const graphPath = await getCleanGraphPath();
-
-    console.log("JSQ ", trustedPaths.join(), graphPath);
-
-    for (const path of trustedPaths) {
-      if (path === graphPath) return true;
-    }
-  }
-
-  logseq.UI.showMsg(
-    "JSQ: Current graph is not trusted! See settings for more info.",
-    "error",
-  );
-
-  return false;
-}
-
 async function main() {
   initSettings();
 
   provideJsqBlockStyles();
-  if (!(await checkTrust())) {
-    return;
-  }
 
   jsq.registerFunction("toggleCode", (e: any) => {
     const doc = top?.document;
@@ -109,15 +78,8 @@ async function main() {
     const [type] = payload.arguments;
     if (!type?.startsWith(":jsq")) return;
 
-    console.log(
-      "FOUND AND STARTING WORK FOR SLOT, UUID",
-      slot,
-      payload.uuid,
-      type,
-    );
-    executeLocalJsq(slot, payload.uuid, type.substring(1));
-
-    // TODO handle custom jsq scripts somewhere that are referenced via jsq-exported-functionname
+    const executor = new JsqExecutor(payload.uuid, slot, type.substring(1));
+    executor.execute();
   });
 }
 

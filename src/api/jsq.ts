@@ -3,9 +3,9 @@
  * All functions here are exported and provided through the `jsq` in their codeblocks.
  */
 
-import { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
-import { button } from "../ui/button";
-import { Props, Table } from "../ui/table";
+import type { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
+import { button } from "../ui/buttons";
+import { type Props, Table } from "../ui/table";
 
 async function datascriptQuery(query: string) {
   return await logseq.DB.datascriptQuery(query);
@@ -14,10 +14,6 @@ async function datascriptQuery(query: string) {
 async function simpleQuery(query: string) {
   return await logseq.DB.q(query);
 }
-
-// TODO separa queryBuilder that lets you build a native query for efficiency
-// that creates a string that we can pass to nativeQuery()
-// would be cross-platform as we cans simply choose the correct backend
 
 async function allPages(): Promise<PageEntity[]> {
   const allPagesQuery = `
@@ -30,7 +26,7 @@ async function allPages(): Promise<PageEntity[]> {
   return await datascriptQuery(allPagesQuery);
 }
 
-async function pageByName(name: string): Promise<PageEntity> {
+async function pageByName(name: string): Promise<PageEntity | undefined> {
   const pageByNameQuery = `
       [
         :find (pull ?p [*])
@@ -40,6 +36,8 @@ async function pageByName(name: string): Promise<PageEntity> {
 
   const matches: PageEntity[][] =
     await logseq.DB.datascriptQuery(pageByNameQuery);
+
+  if (!matches || !matches[0]) return undefined;
 
   return matches[0][0];
 }
