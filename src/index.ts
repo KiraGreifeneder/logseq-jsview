@@ -1,6 +1,7 @@
 import "@logseq/libs";
 import { executeLocalJsq } from "./core/runner";
 import { jsq } from "./lib/jsq";
+import { initSettings } from "./settings";
 
 function getNewJsqBlock() {
   const uuid = crypto.randomUUID();
@@ -45,6 +46,7 @@ function provideJsqBlockStyles() {
 }
 
 async function main() {
+  initSettings();
   provideJsqBlockStyles();
 
   jsq.registerFunction("toggleCode", (e: any) => {
