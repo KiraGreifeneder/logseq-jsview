@@ -12,7 +12,9 @@ This Logseq plugin allows you to
 
 ## Getting Started
 
-Install through the Logseq's plugin store, or clone and run `npm run build`
+This is still an early release, so please back up your graph before trying it.
+
+In the future: Install through the Logseq's plugin store.
 
 ### Trusted Graphs
 
