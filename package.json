@@ -8,10 +8,12 @@
   "main": "dist/index.js",
   "logseq": {
     "id": "logseq-jsv",
-    "title": "JSView"
+    "title": "JSView",
+    "icon": "./assets/JSV.svg"
   },
   "files": [
-    "dist"
+    "dist",
+    "assets/JSV.svg"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",

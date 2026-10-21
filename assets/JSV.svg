@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   sodipodi:docname="JSV.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     inkscape:zoom="0.3262345"
+     inkscape:cx="-487.37947"
+     inkscape:cy="872.07207"
+     inkscape:window-width="1908"
+     inkscape:window-height="1144"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <rect
+       x="99.085292"
+       y="221.89523"
+       width="690.45757"
+       height="391.83583"
+       id="rect7" />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath4">
+      <rect
+         style="fill:#1c1c23;fill-opacity:1;stroke-width:7.00037;paint-order:stroke fill markers"
+         id="rect5"
+         width="512"
+         height="512"
+         x="0"
+         y="0"
+         ry="100.48086" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#1c1c23;fill-opacity:1;stroke-width:7.00037;paint-order:stroke fill markers"
+       id="rect4"
+       width="512"
+       height="512"
+       x="0"
+       y="0"
+       ry="100.48086" />
+    <rect
+       style="fill:#2c2c37;fill-opacity:1;stroke-width:6.98835;paint-order:stroke fill markers"
+       id="rect2"
+       width="512"
+       height="112.34319"
+       x="0"
+       y="0"
+       ry="0"
+       clip-path="url(#clipPath4)" />
+    <ellipse
+       style="fill:#2c2c37;fill-opacity:1;stroke-width:6.98835;paint-order:stroke fill markers"
+       id="path5"
+       cx="103.96978"
+       cy="75.011749"
+       rx="15.351242"
+       ry="14.304566" />
+    <circle
+       style="fill:#d96060;fill-opacity:1;stroke-width:5.1796;paint-order:stroke fill markers"
+       id="path6"
+       cx="81.989594"
+       cy="59.980186"
+       r="21.980186" />
+    <circle
+       style="fill:#cfd168;fill-opacity:1;stroke-width:5.1796;paint-order:stroke fill markers"
+       id="path6-3"
+       cx="141.98019"
+       cy="59.980186"
+       r="21.980186" />
+    <circle
+       style="fill:#60d9a7;fill-opacity:1;stroke-width:5.1796;paint-order:stroke fill markers"
+       id="path6-6"
+       cx="201.98019"
+       cy="59.980186"
+       r="21.980186" />
+    <text
+       xml:space="preserve"
+       id="text7"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:205.013px;font-family:Fetamont;-inkscape-font-specification:Fetamont;letter-spacing:0px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect7);display:inline;fill:#60d9a7;fill-opacity:1;stroke-width:6.98835;paint-order:stroke fill markers"
+       transform="matrix(1.1798761,0,0,1.1798761,-51.639311,-122.58948)"><tspan
+         x="99.085938"
+         y="411.53156"
+         id="tspan1">JSV</tspan></text>
+  </g>
+</svg>

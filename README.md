@@ -1,3 +1,6 @@
+<img src="./assets/JSV.svg" alt="JSView logo" width="128" height="128">
+
+
 # JSView for Logseq
 
 This Logseq plugin allows you to 
