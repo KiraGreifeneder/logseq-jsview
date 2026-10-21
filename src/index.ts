@@ -1,45 +1,45 @@
 import "@logseq/libs";
-import { JsqExecutor } from "./core/executor";
-import { jsq } from "./jsq";
+import { JsvExecutor } from "./core/executor";
+import { jsv } from "./jsv";
 import { initSettings } from "./settings";
 import styles from "./ui/styles.css?raw";
 
-function getNewJsqBlock() {
+function getNewJsvBlock() {
   const uuid = crypto.randomUUID();
   return `
-  ${"```"}jsq
+  ${"```"}jsv
 
   ${"```"}
-  {{renderer :jsq-${uuid}}}
+  {{renderer :jsv-${uuid}}}
 `;
 }
 
-function registerJsqMode() {
+function registerJsvMode() {
   const CM = (window.parent as any).CodeMirror;
   if (!CM) {
     console.warn("host CodeMirror not found");
     return;
   }
-  CM.defineMIME("jsq", "javascript");
+  CM.defineMIME("jsv", "javascript");
 }
 
 async function main() {
   initSettings();
 
   logseq.provideStyle({
-    key: "jsq-styles",
+    key: "jsv-styles",
     style: styles,
   });
 
-  jsq.registerFunction("toggleCode", (e: any) => {
+  jsv.registerFunction("toggleCode", (e: any) => {
     const doc = top?.document;
     const btn = doc?.querySelector(`[data-toggle-id="${e.dataset.toggleId}"]`);
     const block = btn?.closest(".block-content");
     if (!block) return;
 
-    block.classList.toggle("jsq-code-open");
+    block.classList.toggle("jsv-code-open");
 
-    if (block.classList.contains("jsq-code-open")) {
+    if (block.classList.contains("jsv-code-open")) {
       // wait one tick so the browser has laid out the now-visible element
       setTimeout(() => {
         block
@@ -49,17 +49,17 @@ async function main() {
     }
   });
 
-  registerJsqMode();
+  registerJsvMode();
 
-  logseq.Editor.registerSlashCommand("New in-line JSQ", async () => {
-    await logseq.Editor.insertAtEditingCursor(getNewJsqBlock());
+  logseq.Editor.registerSlashCommand("New in-line JSView", async () => {
+    await logseq.Editor.insertAtEditingCursor(getNewJsvBlock());
   });
 
   logseq.App.onMacroRendererSlotted(({ slot, payload }) => {
     const [type] = payload.arguments;
-    if (!type?.startsWith(":jsq")) return;
+    if (!type?.startsWith(":jsv")) return;
 
-    const executor = new JsqExecutor(payload.uuid, slot, type.substring(1));
+    const executor = new JsvExecutor(payload.uuid, slot, type.substring(1));
     executor.execute();
   });
 }

@@ -1,6 +1,6 @@
 /**
- * Represents the public API for JSQ.
- * All functions here are exported and provided through the `jsq` in their codeblocks.
+ * Represents the public API for JSView.
+ * All functions here are exported and provided through the `jsv` in their codeblocks.
  */
 
 import type { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user";
@@ -56,7 +56,7 @@ function registerFunction(name: string, func: Function) {
   });
 }
 
-export const jsq = {
+export const jsv = {
   blocksInPage,
   datascriptQuery,
   allPages,

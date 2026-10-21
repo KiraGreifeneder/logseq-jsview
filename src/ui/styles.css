@@ -1,32 +1,32 @@
-.lsp-hook-ui-slot:has(.jsq-output),
-.lsp-hook-ui-slot:has(.jsq-output) > * {
+.lsp-hook-ui-slot:has(.jsv-output),
+.lsp-hook-ui-slot:has(.jsv-output) > * {
   width: 100%;
   max-width: 100%;
   margin: 0;
 }
 
-.block-content:has(.jsq-output) .extensions__code {
+.block-content:has(.jsv-output) .extensions__code {
   display: none;
 }
 
-.block-content.jsq-code-open:has(.jsq-output) .extensions__code {
+.block-content.jsv-code-open:has(.jsv-output) .extensions__code {
   display: block;
 }
 
-.jsq-output {
-  --jsq-error-color: #cd5c5c;
+.jsv-output {
+  --jsv-error-color: #cd5c5c;
   position: relative;
   width: 100%;
   color: var(--ls-primary-text-color, inherit);
 }
 
-.jsq-output__content {
+.jsv-output__content {
   position: relative;
   width: 100%;
   padding-top: 1.25rem;
 }
 
-.jsq-code-toggle {
+.jsv-code-toggle {
   position: absolute;
   top: 0;
   left: 0;
@@ -46,12 +46,12 @@
   transition: opacity 150ms;
 }
 
-.jsq-code-toggle:hover,
-.jsq-code-toggle:focus-visible {
+.jsv-code-toggle:hover,
+.jsv-code-toggle:focus-visible {
   opacity: 1;
 }
 
-.jsq-button {
+.jsv-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -68,53 +68,53 @@
   cursor: pointer;
 }
 
-.jsq-button:hover {
+.jsv-button:hover {
   background: var(--ls-tertiary-background-color, transparent);
 }
 
-.jsq-code-toggle:focus-visible,
-.jsq-button:focus-visible {
+.jsv-code-toggle:focus-visible,
+.jsv-button:focus-visible {
   outline: 2px solid var(--ls-link-text-color, currentColor);
   outline-offset: 2px;
 }
 
-.jsq-button:disabled {
+.jsv-button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.jsq-table--styled {
+.jsv-table--styled {
   border-collapse: collapse;
 }
 
-.jsq-table--styled > thead {
+.jsv-table--styled > thead {
   border-bottom: 1px solid currentColor;
 }
 
-.jsq-table--styled > thead > tr > th,
-.jsq-table--styled > tbody > tr > td {
+.jsv-table--styled > thead > tr > th,
+.jsv-table--styled > tbody > tr > td {
   text-align: left;
 }
 
-.jsq-table--styled > thead > tr > th {
+.jsv-table--styled > thead > tr > th {
   font-weight: bold;
 }
 
-.jsq-error {
+.jsv-error {
   color: var(--ls-primary-text-color, inherit);
   background: var(--ls-primary-background-color, transparent);
-  border: 1px solid var(--jsq-error-color, #cd5c5c);
+  border: 1px solid var(--jsv-error-color, #cd5c5c);
   border-left-width: 4px;
   border-radius: 6px;
   padding: 12px 16px;
 }
 
-.jsq-error .jsq-error__title,
-.jsq-table-error {
-  color: var(--jsq-error-color, #cd5c5c);
+.jsv-error .jsv-error__title,
+.jsv-table-error {
+  color: var(--jsv-error-color, #cd5c5c);
 }
 
-.jsq-error .jsq-error__message {
+.jsv-error .jsv-error__message {
   color: inherit;
   background: transparent;
   border: 0;
@@ -125,11 +125,11 @@
   overflow-wrap: anywhere;
 }
 
-.jsq-error__context {
+.jsv-error__context {
   opacity: 0.75;
 }
 
-.jsq-error__context code {
+.jsv-error__context code {
   color: inherit;
   background: transparent;
 }

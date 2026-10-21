@@ -1,12 +1,12 @@
 type Phase = "load" | "trust" | "compile" | "runtime" | "result" | "render";
-export class JsqError extends Error {
+export class JsvError extends Error {
   constructor(
     public phase: Phase,
     public blockUuid: string,
     cause?: unknown,
   ) {
-    super(`JSQ ${phase} error`, { cause });
-    this.name = "JsqError";
+    super(`JSView ${phase} error`, { cause });
+    this.name = "JsvError";
   }
 
   public toHtmlElement(): string {
@@ -34,10 +34,10 @@ export class JsqError extends Error {
           : String(this.cause);
 
     return `
-      <div role="alert" class="jsq-error">
-        <strong class="jsq-error__title">JSQ error · ${escapeHtml(this.phase)}</strong>
-        <pre class="jsq-error__message">${escapeHtml(message)}</pre>
-        <small class="jsq-error__context">Block: <code>${escapeHtml(this.blockUuid)}</code></small>
+      <div role="alert" class="jsv-error">
+        <strong class="jsv-error__title">JSView error · ${escapeHtml(this.phase)}</strong>
+        <pre class="jsv-error__message">${escapeHtml(message)}</pre>
+        <small class="jsv-error__context">Block: <code>${escapeHtml(this.blockUuid)}</code></small>
       </div>
     `;
   }

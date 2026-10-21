@@ -1,4 +1,4 @@
-import { jsq } from "../jsq";
+import { jsv } from "../jsv";
 
 type DataValue = string | number | boolean | object | null | undefined;
 
@@ -29,12 +29,12 @@ export function button(
   onclick: (...args: any[]) => void,
   data: Record<string, DataValue> = {},
 ) {
-  const attrs: string[] = [`class="jsq-button"`];
+  const attrs: string[] = [`class="jsv-button"`];
 
   // add onclick function
   const uuid = crypto.randomUUID();
   const fnName = `custom-btn-fn-${uuid}`;
-  jsq.registerFunction(fnName, onclick);
+  jsv.registerFunction(fnName, onclick);
 
   attrs.push(`data-on-click="${fnName}"`);
 
@@ -62,6 +62,6 @@ export function uniqueCodeToggleBtn() {
         data-on-click="toggleCode"
         data-toggle-id="${toggleId}"
         title="Show/hide code"
-        class="jsq-code-toggle"
-      >show/hide jsq block &lt;/&gt;</button>`;
+        class="jsv-code-toggle"
+      >show/hide jsv block &lt;/&gt;</button>`;
 }

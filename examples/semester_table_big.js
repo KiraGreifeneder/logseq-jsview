@@ -1,6 +1,6 @@
-const deadlines = await jsq.simpleQuery(`(property :deadline-name)`);
+const deadlines = await jsv.simpleQuery(`(property :deadline-name)`);
 
-const table = jsq.table();
+const table = jsv.table();
 table.headers(["Name", "Status", "Days Left"]);
 
 // sort by date - put passed deadlines at the end
@@ -104,7 +104,7 @@ async function setStatus(e) {
   console.log("after", d.properties.deadlineStatus);
 }
 
-jsq.registerFunction(setStatus);
+jsv.registerFunction(setStatus);
 
 for (d of deadlines) {
   const props = d.properties;

@@ -7,7 +7,7 @@ export default defineConfig({
   exports: false,
   platform: 'browser',
   plugins: [{
-    name: 'jsq-css-text',
+    name: 'jsv-css-text',
     async load(id) {
       if (!id.endsWith('.css?raw')) return null;
       const path = id.slice(0, -'?raw'.length);

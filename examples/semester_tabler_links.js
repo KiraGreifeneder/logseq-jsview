@@ -1,6 +1,6 @@
-const deadlines = await jsq.simpleQuery(`(property :deadline-name)`);
+const deadlines = await jsv.simpleQuery(`(property :deadline-name)`);
 
-const table = jsq.table();
+const table = jsv.table();
 table.headers(["Name", "Status", "Days Left"]);
 
 // sort by date - put passed deadlines at the end
@@ -85,7 +85,7 @@ async function goToBlock(e) {
   logseq.App.pushState("page", { name: uuid });
 }
 
-jsq.registerFunction("goToBlock", goToBlock);
+jsv.registerFunction("goToBlock", goToBlock);
 
 function blockLink(uuid, label) {
   return `<a data-on-click="goToBlock" data-uuid="${uuid}" style="cursor:pointer">${label}</a>`;

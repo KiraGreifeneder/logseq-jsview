@@ -1,6 +1,6 @@
-const deadlines = await jsq.simpleQuery(`(property :deadline-name)`);
+const deadlines = await jsv.simpleQuery(`(property :deadline-name)`);
 
-const table = jsq.table();
+const table = jsv.table();
 table.headers(["Name", "Date", "Time", "Status", "Page"]);
 
 for (d of deadlines) {

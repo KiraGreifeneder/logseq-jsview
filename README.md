@@ -1,11 +1,11 @@
-# Logseq JSQ (Javascript Querying)
+# JSView for Logseq
 
 This Logseq plugin allows you to 
 
-- [ ] Query and process pages in your graph through an intuitive Javascript API
-- [ ] Process your pages as JSON objects
+- [x] Query and process pages in your graph through an intuitive Javascript API
+- [x] Process your pages as JSON objects
 - [X] Render arbitrary output from a codeblock directly on your page
-- [ ] Run javascript functions from your own scripts inside Logseq's context to automate whatever you want
+- [x] Run javascript functions from your own scripts inside Logseq's context to automate whatever you want
 
 ## Why?
 
@@ -19,37 +19,37 @@ The goal of this plugin is not:
 - to be as efficient as possible
 - to write Datalog queries for you
 
-the JSQ plugin simply lets you use the logseq api (as well as helpers through the JSQ api) and do whatever you want with your graph/pages/blocks :)
+the JSView plugin simply lets you use the logseq api (as well as helpers through the JSView api) and do whatever you want with your graph/pages/blocks :)
 
 ## Styling
 
 Plugin-owned styles live in [src/ui/styles.css](./src/ui/styles.css). The bundler
-loads the CSS as text, and [src/ui/styles.ts](./src/ui/styles.ts) registers it
-once through `logseq.provideStyle()` in Logseq's document. JSQ uses
-`jsq-`-prefixed CSS classes rather than relying on Logseq's utility classes.
-Host slot sizing and code visibility rules target only slots containing JSQ
+loads the CSS as text, and [src/index.ts](./src/index.ts) registers it
+once through `logseq.provideStyle()` in Logseq's document. JSView uses
+`jsv-`-prefixed CSS classes rather than relying on Logseq's utility classes.
+Host slot sizing and code visibility rules target only slots containing JSView
 output, leaving other plugins' slots alone.
 
 Styles inherit theme colors and use Logseq CSS variables with fallbacks.
 Returned HTML and user-supplied table attributes can still provide their own
-classes and inline styles; these are not rewritten by JSQ.
+classes and inline styles; these are not rewritten by JSView.
 
 ### Tables
 
-`jsq.table()` adds a 1px underline beneath the header, bold header cells,
+`jsv.table()` adds a 1px underline beneath the header, bold header cells,
 and left-aligned cells:
 
 ```js
-return jsq.table()
+return jsv.table()
   .headers(["Task", "Status"])
   .row(["Publish V1", "Pending"]);
 ```
 
-Chain `.withoutStyle()` to disable JSQ's default table appearance.
+Chain `.withoutStyle()` to disable JSView's default table appearance.
 This does not reset styles from Logseq or your theme:
 
 ```js
-return jsq.table({ class: "my-table" })
+return jsv.table({ class: "my-table" })
   .withoutStyle()
   .headers(["Task", "Status"])
   .row(["Publish V1", "Pending"]);

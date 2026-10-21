@@ -1,13 +1,13 @@
 {
-  "name": "logseq-jsq",
+  "name": "logseq-jsv",
   "type": "module",
   "version": "0.0.0",
   "private": true,
   "description": "A logseq plugin that abstracts and simplifies data retrieval and display through javascript.",
   "main": "dist/index.js",
   "logseq": {
-    "id": "logseq-jsq",
-    "title": "logseq-jsq"
+    "id": "logseq-jsv",
+    "title": "JSView"
   },
   "files": [
     "dist"

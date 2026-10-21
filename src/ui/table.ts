@@ -3,14 +3,14 @@ export type Row = { cells: Cell[]; props?: Props } | Cell[];
 export type Props = { [key: string]: string };
 
 /**
- * Builds an HTML table through `jsq.table(tableProps?)`.
+ * Builds an HTML table through `jsv.table(tableProps?)`.
  *
  * Call `headers(row)` to set or replace the optional header, and `row(row)` to
  * append a body row. Both return the table so calls can be chained.
- * You can return the table from a JSQ block directly or call `toString()` to get its HTML.
+ * You can return the table from a JSView block directly or call `toString()` to get its HTML.
  * Default styling adds a 1px header underline, bold header cells, and
  * left-aligned cells.
- * Chain `withoutStyle()` to omit JSQ's default table styling;
+ * Chain `withoutStyle()` to omit JSView's default table styling;
  * Logseq, theme, and user styles can still apply.
  *
  * A row is either an array of cells or `{ cells: [...], props: {...} }`.
@@ -25,7 +25,7 @@ export type Props = { [key: string]: string };
  * so please only supply trusted attributes.
  *
  * @example
- * const table = jsq.table({ style: "border-collapse: collapse" })
+ * const table = jsv.table({ style: "border-collapse: collapse" })
  *   .headers(["Task", "Status"])
  *   .row(["Write docs", "Done"])
  *   .row({
@@ -69,8 +69,8 @@ export class Table {
     const { class: customClass, ...props } = this.props ?? {};
 
     const classes = [
-      "jsq-table",
-      ...(this.styled ? ["jsq-table--styled"] : []),
+      "jsv-table",
+      ...(this.styled ? ["jsv-table--styled"] : []),
       ...(customClass ? [customClass] : []),
     ].join(" ");
 

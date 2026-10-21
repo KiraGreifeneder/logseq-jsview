@@ -1,6 +1,6 @@
-import { jsq } from "../jsq";
+import { jsv } from "../jsv";
 import { uniqueCodeToggleBtn } from "../ui/buttons";
-import { JsqError } from "./errors";
+import { JsvError } from "./errors";
 import { checkTrust } from "./trust";
 
 type DebugInfo = {
@@ -9,13 +9,13 @@ type DebugInfo = {
   key: string;
 };
 
-type CompiledJsq = (
-  api: typeof jsq,
+type CompiledJsv = (
+  api: typeof jsv,
   host: typeof logseq,
   debug: DebugInfo,
 ) => Promise<unknown>;
 
-type AsyncFunctionConstructor = new (...args: string[]) => CompiledJsq;
+type AsyncFunctionConstructor = new (...args: string[]) => CompiledJsv;
 
 const AsyncFunction = Object.getPrototypeOf(async function () {})
   .constructor as AsyncFunctionConstructor;
@@ -25,11 +25,11 @@ function minify(html: string): string {
 }
 
 /**
- * One instance of JsqExecutor should be created for each JSQ Block/slot.
+ * One instance of JsvExecutor should be created for each JSView Block/slot.
  * Holds the block and slot information and runs through the pipeline of loading, compiling and running the user's code.
  * Tries to collect errors on the way and display them.
  */
-export class JsqExecutor {
+export class JsvExecutor {
   constructor(
     private blockUuid: string,
     private slotId: string,
@@ -47,61 +47,61 @@ export class JsqExecutor {
       const result = await this.run(func);
       this.render(result);
     } catch (cause) {
-      console.error("[jsq]", this.blockUuid, cause);
+      console.error("[jsv]", this.blockUuid, cause);
 
       const error =
-        cause instanceof JsqError
+        cause instanceof JsvError
           ? cause
-          : new JsqError("runtime", this.blockUuid, cause);
+          : new JsvError("runtime", this.blockUuid, cause);
 
       this.render(error.toHtmlElement());
     }
   }
 
   /**
-   * Loads the JSQ code for a block by finding the code block and reading its contents.
+   * Loads the JSView code for a block by finding the code block and reading its contents.
    * @returns the code inside the block as a string.
    */
   private async load(): Promise<string> {
-    const JSQ_BLOCK_REGEX =
-      /^\x60{3}jsq[ \t]*\r?\n([\s\S]*?)\r?\n?^\x60{3}[ \t]*$/m;
+    const JSV_BLOCK_REGEX =
+      /^\x60{3}jsv[ \t]*\r?\n([\s\S]*?)\r?\n?^\x60{3}[ \t]*$/m;
 
     const block = await logseq.Editor.getBlock(this.blockUuid);
-    const jsq_block_matches = block?.content?.match(JSQ_BLOCK_REGEX);
+    const jsv_block_matches = block?.content?.match(JSV_BLOCK_REGEX);
 
-    if (!jsq_block_matches?.[1]) {
-      throw new JsqError("load", this.blockUuid, "No valid JSQ Block found.");
+    if (!jsv_block_matches?.[1]) {
+      throw new JsvError("load", this.blockUuid, "No valid JSView Block found.");
     }
 
-    return jsq_block_matches[1];
+    return jsv_block_matches[1];
   }
 
   /**
    * Turns the code body into an async function object, reports "compilation" errors (e.g. syntax errs.)
    * @param code the (async) function body code as a string.
    */
-  private compile(code: string): CompiledJsq {
+  private compile(code: string): CompiledJsv {
     try {
-      return new AsyncFunction("jsq", "logseq", "debug", code);
+      return new AsyncFunction("jsv", "logseq", "debug", code);
     } catch (cause) {
-      throw new JsqError("compile", this.blockUuid, cause);
+      throw new JsvError("compile", this.blockUuid, cause);
     }
   }
 
   /**
-   * Takes the Jsq function, passes the jsq api object, logseq and some debug info to it, and runs it.
+   * Takes the Jsv function, passes the jsv api object, logseq and some debug info to it, and runs it.
    * @param func an async function that returns something unknown, to be handled by the user...
    */
-  private async run(func: CompiledJsq) {
+  private async run(func: CompiledJsv) {
     let result;
     try {
-      result = await func(jsq, logseq, {
+      result = await func(jsv, logseq, {
         slotId: this.slotId,
         blockUuid: this.blockUuid,
         key: this.key,
       });
     } catch (cause) {
-      throw new JsqError("runtime", this.blockUuid, cause);
+      throw new JsvError("runtime", this.blockUuid, cause);
     }
     return result;
   }
@@ -112,9 +112,9 @@ export class JsqExecutor {
       slot: this.slotId,
       reset: true,
       template: minify(`
-    <div class="jsq-output">
+    <div class="jsv-output">
       ${uniqueCodeToggleBtn()}
-      <div class="jsq-output__content">${content}</div>
+      <div class="jsv-output__content">${content}</div>
     </div>
   `),
     });

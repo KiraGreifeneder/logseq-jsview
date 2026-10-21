@@ -1,6 +1,6 @@
-const deadlines = await jsq.simpleQuery(`(page-property :semester "WS26")`);
+const deadlines = await jsv.simpleQuery(`(page-property :semester "WS26")`);
 
-const table = jsq.table();
+const table = jsv.table();
 
 for (d of deadlines) {
   const props = d.properties;
