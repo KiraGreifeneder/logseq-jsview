@@ -9,7 +9,8 @@
   "logseq": {
     "id": "logseq-jsview",
     "title": "JSView",
-    "icon": "./assets/JSV.svg"
+    "icon": "./assets/JSV.svg",
+    "unsupportedGraphType": "db"
   },
   "files": [
     "dist",
