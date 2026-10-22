@@ -1,5 +1,5 @@
 {
-  "name": "logseq-jsview",
+  "name": "logseq-plugin-jsview",
   "type": "module",
   "version": "0.1.2",
   "license": "MIT",
