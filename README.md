@@ -88,11 +88,7 @@ the JSView plugin simply lets you use the logseq api (as well as helpers through
 
 ## Documentation
 
-- [Overview](./docs/overview.md)
-- [Queries](./docs/queries.md)
-- [UI: tables, buttons, and styling](./docs/ui.md)
-- [Function registration](./docs/function-registration.md)
-- [Logseq data and query results](./docs/logseq-api.md)
+See the online [docs](https://github.com/KiraGreifeneder/logseq-jsview/tree/main/docs).
 
 ## License
 

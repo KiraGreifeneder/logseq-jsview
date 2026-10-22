@@ -1,0 +1,50 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Verify tag matches package.json version
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version v$version" >&2
+            exit 1
+          fi
+
+      - run: npm test
+
+      - run: npm run build
+
+      # Logseq loads a plugin from a folder containing package.json (with its
+      # "main" and "logseq.icon" entries) plus the built files.
+      - name: Package plugin
+        run: |
+          mkdir -p release/logseq-jsv
+          cp -r dist release/logseq-jsv/
+          mkdir release/logseq-jsv/assets
+          cp assets/JSV.svg release/logseq-jsv/assets/
+          cp package.json README.md LICENSE release/logseq-jsv/
+          cd release && zip -r ../logseq-jsv-${GITHUB_REF_NAME}.zip logseq-jsv
+
+      - uses: softprops/action-gh-release@v3.0.0
+        with:
+          files: logseq-jsv-*.zip
+          generate_release_notes: true
