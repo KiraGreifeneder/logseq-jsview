@@ -1,8 +1,7 @@
 import { jsv } from "../jsv";
 import { button, uniqueCodeToggleBtn } from "../ui/buttons";
-import { JsvError, type Phase } from "./errors";
 import { clearCallbacks, registerFunction, type Callback } from "./callbacks";
-import { checkTrust } from "./trust";
+import { JsvError, type Phase } from "./errors";
 
 type DebugInfo = {
   slotId: string;
@@ -41,14 +40,19 @@ export class JsvExecutor {
     clearCallbacks(this.slotId);
     try {
       const code = await this.load();
+
       phase = "trust";
-      if (!(await checkTrust())) return;
+      await this.checkTrust();
+
       phase = "compile";
       const func = this.compile(code);
+
       phase = "runtime";
       const result = await this.run(func);
+
       phase = "result";
       const content = String(result);
+
       phase = "render";
       this.render(content);
     } catch (cause) {
@@ -73,6 +77,45 @@ export class JsvExecutor {
   }
 
   /**
+   * Ensures the current graph is listed in the trustedPaths setting.
+   * @throws JsvError in the "trust" phase if the setting is invalid or the graph isn't trusted.
+   */
+  private async checkTrust(): Promise<void> {
+    const trustedPaths: unknown = logseq.settings?.["trustedPaths"] ?? [];
+
+    if (
+      !Array.isArray(trustedPaths) ||
+      !trustedPaths.every(
+        (path: unknown): path is string =>
+          typeof path === "string" && path.trim().length > 0,
+      )
+    ) {
+      throw new JsvError(
+        "trust",
+        this.blockUuid,
+        "trustedPaths must be an array of non-empty graph paths. Check plugin settings.",
+      );
+    }
+
+    const graph = await logseq.App.getCurrentGraph();
+    if (!graph || typeof graph.path !== "string" || !graph.path) {
+      throw new JsvError(
+        "trust",
+        this.blockUuid,
+        "Cannot determine the current graph path. Code execution is blocked.",
+      );
+    }
+
+    if (!trustedPaths.includes(graph.path)) {
+      throw new JsvError(
+        "trust",
+        this.blockUuid,
+        `Graph "${graph.path}" is not trusted. Add its exact path to trustedPaths in plugin settings only if you trust its code.`,
+      );
+    }
+  }
+
+  /**
    * Loads the JSView code for a block by finding the code block and reading its contents.
    * @returns the code inside the block as a string.
    */
@@ -84,7 +127,11 @@ export class JsvExecutor {
     const jsv_block_matches = block?.content?.match(JSV_BLOCK_REGEX);
 
     if (jsv_block_matches?.[1] === undefined) {
-      throw new JsvError("load", this.blockUuid, "No valid JSView Block found.");
+      throw new JsvError(
+        "load",
+        this.blockUuid,
+        "No valid JSView Block found.",
+      );
     }
 
     return jsv_block_matches[1];
@@ -110,7 +157,8 @@ export class JsvExecutor {
     try {
       const api: typeof jsv = {
         ...jsv,
-        button: (text, onclick, data) => button(text, onclick, data, this.slotId),
+        button: (text, onclick, data) =>
+          button(text, onclick, data, this.slotId),
         registerFunction: (name: string, callback: Callback) =>
           registerFunction(name, callback, this.slotId),
       };

@@ -46,6 +46,8 @@ For example:
 }
 ```
 
+Then re-open Logseq or reload it with `Ctrl + R`
+
 > Please use the absolute path!
 
 ### Creating JSView blocks
