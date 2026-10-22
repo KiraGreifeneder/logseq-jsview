@@ -42,9 +42,9 @@ jobs:
           mkdir release/logseq-jsv/assets
           cp assets/JSV.svg release/logseq-jsv/assets/
           cp package.json README.md LICENSE release/logseq-jsv/
-          cd release && zip -r ../logseq-jsv-${GITHUB_REF_NAME}.zip logseq-jsv
+          cd release && zip -r ../logseq-jsv.zip logseq-jsv
 
       - uses: softprops/action-gh-release@v3.0.0
         with:
-          files: logseq-jsv-*.zip
+          files: logseq-jsv.zip
           generate_release_notes: true
