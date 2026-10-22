@@ -37,14 +37,14 @@ jobs:
       # "main" and "logseq.icon" entries) plus the built files.
       - name: Package plugin
         run: |
-          mkdir -p release/logseq-jsv
-          cp -r dist release/logseq-jsv/
-          mkdir release/logseq-jsv/assets
-          cp assets/JSV.svg release/logseq-jsv/assets/
-          cp package.json README.md LICENSE release/logseq-jsv/
-          cd release && zip -r ../logseq-jsv.zip logseq-jsv
+          mkdir -p release/logseq-jsview
+          cp -r dist release/logseq-jsview/
+          mkdir release/logseq-jsview/assets
+          cp assets/JSV.svg release/logseq-jsview/assets/
+          cp package.json README.md LICENSE release/logseq-jsview/
+          cd release && zip -r ../logseq-jsview.zip logseq-jsv
 
       - uses: softprops/action-gh-release@v3.0.0
         with:
-          files: logseq-jsv.zip
+          files: logseq-jsview.zip
           generate_release_notes: true
