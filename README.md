@@ -5,7 +5,7 @@
 
 This Logseq plugin allows you to 
 
-- Query and process pages in your graph through JSView API (or directly through the LogSeq API)
+- Query and process pages in your graph through [JSView API](https://github.com/KiraGreifeneder/logseq-jsview/tree/main/docs) (or directly through the LogSeq API)
 - Process your pages as JSON objects
 - Render arbitrary output from a javascript codeblock directly on your page
 - Easily create tables and buttons with the built-in JSView
@@ -14,9 +14,9 @@ This Logseq plugin allows you to
 
 This is still an early release, so please back up your graph before trying it.
 
-In the future: Install through the Logseq's plugin store.
+Install through the Logseq marketplace.
 
-Or to install manually:
+Or to build from source:
 
 ```
 git clone https://github.com/KiraGreifeneder/logseq-jsview.git
