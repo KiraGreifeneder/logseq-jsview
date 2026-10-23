@@ -1,11 +1,11 @@
 {
   "name": "logseq-plugin-jsview",
   "type": "module",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "private": false,
   "description": "A logseq plugin that abstracts and simplifies data retrieval and display through javascript.",
-  "main": "dist/index.js",
+  "main": "index.html",
   "logseq": {
     "id": "logseq-jsview",
     "title": "JSView",

@@ -3,6 +3,8 @@
 
 # JSView for Logseq
 
+Current version: 0.1.3
+
 This Logseq plugin allows you to 
 
 - Query and process pages in your graph through [JSView API](https://github.com/KiraGreifeneder/logseq-jsview/tree/main/docs) (or directly through the LogSeq API)
