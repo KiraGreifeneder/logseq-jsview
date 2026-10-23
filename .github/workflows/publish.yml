@@ -40,7 +40,7 @@ jobs:
           mkdir -p release/logseq-jsview
           cp -r dist release/logseq-jsview/
           mkdir release/logseq-jsview/assets
-          cp assets/JSV.svg release/logseq-jsview/assets/
+          cp assets/JSV.png release/logseq-jsview/assets/
           cp index.html package.json README.md LICENSE release/logseq-jsview/
           cd release && zip -r ../logseq-jsview.zip logseq-jsview
 

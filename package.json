@@ -1,7 +1,7 @@
 {
   "name": "logseq-plugin-jsview",
   "type": "module",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "private": false,
   "description": "A logseq plugin that abstracts and simplifies data retrieval and display through javascript.",
@@ -9,12 +9,12 @@
   "logseq": {
     "id": "logseq-jsview",
     "title": "JSView",
-    "icon": "./assets/JSV.svg",
+    "icon": "./assets/JSV.png",
     "unsupportedGraphType": "db"
   },
   "files": [
     "dist",
-    "assets/JSV.svg",
+    "assets/JSV.png",
     "index.html"
   ],
   "scripts": {
