@@ -3,7 +3,7 @@
 
 # JSView for Logseq
 
-Current version: 0.1.4
+Current version: 0.1.5
 
 This Logseq plugin allows you to 
 
